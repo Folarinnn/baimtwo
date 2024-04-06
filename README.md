@@ -47,8 +47,16 @@ This project is intended to be a baseline for developers to extend there use cas
 ## Configuration and Setup
 
 ### Step 1: Creating an S3 Bucket
-- We will need an S3 bucket to store an image. This step will be required in order to do image-to-text inference calls to certain models.
+- This step will be required in order to do image-to-text and text-to-image inference calls to certain models.
+- Please make sure that you are in the **us-west-2** region. If another region is required, you will need to update the region in the `InvokeAgent.py` file on line 22 of the code. 
+- Create an S3 bucket, and call it `agent-model-calls-alias`. We will use the default settings.
 
+### Step 2: Create an Amazon ECR (Elastic Container Registry)
+-
+
+
+### Step 3: Lambda Function Configuration
+- Create a Lambda function (Python 3.12) for the Bedrock agent's action group. We will call this Lambda function `PortfolioCreator-actions`. 
 
 
 
