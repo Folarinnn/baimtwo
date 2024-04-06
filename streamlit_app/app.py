@@ -130,11 +130,16 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
 st.write("## Model Prompts")
 
 # Anthropic Prompts
-anthropic_prompts = [
-    {"Prompt": "use model 'anthropic.claude-3-haiku-20240307-v1:0' and tell me some things that most people are happy for, and afraid of.", 
-     "Usecase": "Emotion Analysis"},
+anthropic_prompts1 = [
     {"Prompt": "use model 'anthropic.claude-3-haiku-20240307-v1:0' and describe to me the image that is uploaded", 
      "Usecase": "Image-to-Text"},
+    {"Prompt": "use model 'anthropic.claude-3-sonnet-20240229-v1:0' and describe to me the image that is uploaded, then compare the difference with the previous model description ", 
+     "Usecase": "Image-to-Text & Comparison"},
+]
+
+anthropic_prompts2 = [
+    {"Prompt": "use model 'anthropic.claude-3-haiku-20240307-v1:0' and tell me some things that most people are happy for, and afraid of.", 
+     "Usecase": "Text Generation"},
     {"Prompt": "use model 'anthropic.claude-3-sonnet-20240229-v1:0' and write a sonnet about a lost kingdom",
      "Usecase": "Text Generation"},
     {"Prompt": "use model 'anthropic.claude-v2:1' for a summary of the latest climate change research findings",
@@ -189,7 +194,10 @@ ai21labs_prompts = [
 
 # Displaying the prompts as tables
 st.write("### Anthropic Models")
-st.table(anthropic_prompts)
+st.write("# The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function.")
+st.table(anthropic_prompts1)
+st.write("# Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected.")
+st.table(anthropic_prompts2)
 
 st.write("### Mistral Models")
 st.table(mistral_prompts)
