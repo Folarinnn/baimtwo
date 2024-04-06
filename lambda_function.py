@@ -1,15 +1,14 @@
 import json
-import sys
 import os
 import base64
-import json
 import logging
 import boto3
 import io
+import time
 from PIL import Image
 from botocore.exceptions import ClientError
 from langchain.llms.bedrock import Bedrock
-from langchain_community.chat_models import BedrockChat
+#from langchain_community.chat_models import BedrockChat
 s3 = boto3.client('s3')
 
 
@@ -66,6 +65,22 @@ def lambda_handler(event, context):
         #fetched_image = Image.open(file_stream)    
 
 
+    def get_image_response(client, prompt_content): #text-to-text client function
+        
+        request_body = json.dumps({"text_prompts": 
+                                [ {"text": prompt_content } ], #prompts to use
+                                "cfg_scale": 9, #how closely the model tries to match the prompt
+                                "steps": 50, }) #number of diffusion steps to perform
+        
+        response = client.invoke_model(body=request_body, modelId=model_id) #call the Bedrock endpoint
+
+        payload = json.loads(response.get('body').read()) #load the response body into a json object
+        images = payload.get('artifacts') #extract the image artifacts
+        image_data = base64.b64decode(images[0].get('base64')) #decode image
+        output = io.BytesIO(image_data) #return a BytesIO object for client app consumption
+                    
+        return output
+        
     class Claude3Wrapper:
         """Encapsulates Claude 3 model invocations using the Amazon Bedrock Runtime client."""
         def __init__(self, client=None):
@@ -236,15 +251,50 @@ def lambda_handler(event, context):
         
 
     def get_text_response(model_id, prompt):
-        
+        client = boto3.client(service_name="bedrock-runtime", region_name=os.environ.get("BWB_REGION_NAME"))
+
         if model_id == 'anthropic.claude-3-haiku-20240307-v1:0' or model_id == 'anthropic.claude-3-sonnet-20240229-v1:0':
             # Invoke Claude 3 with text
-            client = boto3.client(service_name="bedrock-runtime", region_name=os.environ.get("BWB_REGION_NAME"))
             wrapper = Claude3Wrapper(client)
             if not encoded_image:
                 return wrapper.invoke_claude_3_with_text(prompt)
             else:
                 return wrapper.invoke_claude_3_multimodal(prompt, encoded_image)
+            
+        elif model_id.startswith('stability'):  # Check if it's a "stability" model
+            wrapper = Claude3Wrapper()
+            image_response = get_image_response(wrapper.client, prompt)  # Pass wrapper.client
+            
+            def save_image_to_s3(image_bytes, bucket, object_name):
+                """
+                Saves an image (provided as bytes) to an S3 bucket.
+                
+                Args:
+                - image_bytes: BytesIO object containing image data.
+                - bucket: Name of the S3 bucket.
+                - object_name: S3 object name under which the image will be saved.
+                """
+                # Convert BytesIO object to bytes if not already in bytes format
+                if isinstance(image_bytes, io.BytesIO):
+                    image_bytes = image_bytes.getvalue()
+                
+                # Upload the image to S3
+                s3.put_object(Bucket=bucket, Key=object_name, Body=image_bytes)
+                print(f"Image successfully saved to s3://{bucket}/{object_name}")
+
+                return f"Image successfully saved to s3://{bucket}/{object_name}"
+
+            image_response = get_image_response(wrapper.client, prompt)
+            # Define an appropriate object name based on your naming convention
+            # e.g., using a timestamp or a unique identifier to avoid name collisions
+            object_name = 'generated_images/image_{}.png'.format(int(time.time()))      
+
+            # Save the generated image to S3
+            save_image_to_s3(image_response, bucket_name, object_name)
+
+            return "Image saved to S3: {}/{}".format(bucket_name, object_name)
+
+                 
         else:
             model_kwargs = get_inference_parameters(model_id)
             llm = Bedrock(
