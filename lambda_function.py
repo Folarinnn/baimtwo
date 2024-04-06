@@ -11,7 +11,6 @@ from langchain.llms.bedrock import Bedrock
 #from langchain_community.chat_models import BedrockChat
 s3 = boto3.client('s3')
 
-
 logger = logging.getLogger(__name__)
 
 def lambda_handler(event, context):
@@ -27,8 +26,6 @@ def lambda_handler(event, context):
 
     print("MODE ID: " + model_id)
     print("PROMPT: " + prompt)
-    #print("ENCODED IMAGE: " + encoded_image)
-
 
     bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
     object_name = 'mypic.png' 
@@ -309,8 +306,6 @@ def lambda_handler(event, context):
     # Main execution
     response = get_text_response(model_id, prompt)
     print(response)
-
-
 
 
 
