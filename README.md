@@ -1,19 +1,44 @@
-## AWS Lambda Base Container Images
+# Setup Amazon Bedrock agent, knowledge base, and action group with Streamlit
 
-AWS provided base images for Lambda contain all the required components to run your functions packaged as container images on AWS Lambda.
-These base images contain the Amazon Linux Base operating system, the runtime for a given language, dependencies and the Lambda Runtime Interface Client (RIC), which implements the Lambda [Runtime API](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html).
-The Lambda Runtime Interface Client allows your runtime to receive requests from and send requests to the Lambda service.
+## Introduction
+This project is intended to be a baseline for developers to extend there use cases with Amazon Bedrock agents across most available models in Bedrock. This README will guide you through setting this up step by step to empower you to further explore the capabilities of Bedrock agents. 
 
-To learn more about how these images are used, check out the AWS documentation on how to [Create an image from an AWS base image for Lambda](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-create-1).
 
-### Maintenance policy
+## Prerequisites
+- An active AWS Account.
+- Familiarity with AWS services like Amazon Bedrock, S3, Lambda, Athena and Cloud9 , and Docker.
 
-AWS will regularly provide security patches and other updates for these base images.
-These images are similar to the AWS Lambda execution environment on the cloud to allow customers to easily packaging functions to the container image.
-However, we may choose to optimize the container images by changing the components or dependencies included.
-When deployed to AWS Lambda these images will be run as-is.
+## Models this project currently supports:
 
-This is more of an *artifact store* than a Git repository, for reasons explained later. Please note that **branches other than `main` are regularly force-pushed, and content may disappear without warning**.
+### Anthropic: Claude
+anthropic.claude-3-haiku-20240307-v1:0
+anthropic.claude-3-sonnet-20240229-v1:0
+anthropic.claude-v2:1
+anthropic.claude-v2
+anthropic.claude-instant-v1
+
+### Mistral: models
+mistral.mistral-large-2402-v1:0
+mistral.mistral-7b-instruct-v0:2
+mistral.mixtral-8x7b-instruct-v0:1
+
+### Meta: Llama models
+meta.llama2-13b-chat-v1
+meta.llama2-70b-chat-v1
+
+### Amazon: Titam Models
+amazon.titan-text-lite-v1
+amazon.titan-text-express-v1
+amazon.titan-image-generator-v1 (in preview)
+
+### Cohere: Command Models
+cohere.command-text-v14
+cohere.command-light-text-v14
+
+### AI21labs: Jurassic models
+ai21.j2-ultra-v1
+ai21.j2-mid-v1
+
 
 ## What we're doing here
 
@@ -25,38 +50,3 @@ This is more of an *artifact store* than a Git repository, for reasons explained
 6. Create action group in agent using Lambda and api schema(in S3)
 
 
-## Usage
-
-### Requirements
-To re-create the AWS Lambda base images, make sure you have the following pre-requisites set up:
-- [git](https://git-scm.com/downloads)
-- [git-lfs](https://git-lfs.github.com/)
-- [docker](https://docs.docker.com/get-docker/)
-
-### Building an image
-First, clone this repository:
-```
-git clone https://github.com/aws/aws-lambda-base-images
-```
-
-Then, checkout the branch relevant to the Lambda base image you want to build.
-
-eg. to build the `nodejs18.x` image, start by checking out the `nodejs18.x` branch:
-```
-git checkout nodejs18.x
-```
-
-Finally you can build your image as such:
-```
-docker build -t nodejs18.x:local -f Dockerfile.nodejs18.x .
-```
-
-This will use the Dockerfile at `Dockerfile.nodejs18.x` and tag the newly-built image as `nodejs18.x:local`.
-
-
-## Licence
-
-This project is licensed under the Apache-2.0 License.
-# bedrock-agent-call-multiple-models
-# bedrock-agent-call-multiple-models
-# bedrock-agent-call-multiple-models

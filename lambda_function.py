@@ -205,11 +205,12 @@ def lambda_handler(event, context):
         elif(bedrock_model_provider == 'anthropic'): #Anthropic
             #example modelID: openai.gpt-3.5-turbo
             return { 
-                "max_tokens": 512,
-                "temperature": 0, 
+                "max_tokens_to_sample": 300,
+                "temperature": 0.5, 
                 "top_k": 250, 
                 "top_p": 1, 
-                "stop_sequences": ["\n\nHuman:"] 
+                "stop_sequences": ["\n\nHuman:"],
+                "anthropic_version": "bedrock-2023-05-31" 
             }
 
         else: #Amazon
