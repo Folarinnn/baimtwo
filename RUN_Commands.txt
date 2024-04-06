@@ -6,5 +6,5 @@ Requirements:
 RUN Commands (update account-number & Region):
 1. aws ecr get-login-password --region {Region} | docker login --username AWS --password-stdin {account-number}.dkr.ecr.{Region}.amazonaws.com
 2. docker build -t python3.11:local -f Dockerfile.python3.11 .
-3. docker tag python3.11:local {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-internet-search-langchain:latest
-4. docker push {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-internet-search-langchain:latest 
+3. docker tag python3.11:local {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-model-calls:latest
+4. docker push {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest 
