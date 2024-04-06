@@ -35,6 +35,10 @@ This project is intended to be a baseline for developers to extend there use cas
 - cohere.command-text-v14
 - cohere.command-light-text-v14
 
+### Stability AI: SDXL Models
+- stability.stable-diffusion-xl-v0
+- stability.stable-diffusion-xl-v1
+
 ### AI21labs: Jurassic models
 - ai21.j2-ultra-v1
 - ai21.j2-mid-v1

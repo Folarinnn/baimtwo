@@ -202,6 +202,17 @@ def lambda_handler(event, context):
                 "max_gen_len": 512
             }
         
+        elif (bedrock_model_provider == 'stability'): #META
+            #example modelID: stability.stable-diffusion-xl-v0
+            return {
+                "weight": 1,
+                "cfg_scale": 10,
+                "seed": 0,
+                "steps": 50,
+                "width": 512,
+                "height": 512
+            }        
+        
         elif(bedrock_model_provider == 'anthropic'): #Anthropic
             #example modelID: openai.gpt-3.5-turbo
             return { 
