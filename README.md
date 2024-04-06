@@ -42,7 +42,7 @@ This project is intended to be a baseline for developers to extend there use cas
 
 ## Diagram
 
-![Diagram](Streamlit_App/images/diagram.png)
+![Diagram](images/diagram.png)
 
 ## Configuration and Setup
 
