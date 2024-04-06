@@ -131,20 +131,20 @@ st.write("## Model Prompts")
 
 # Anthropic Prompts
 anthropic_prompts1 = [
-    {"Prompt": "use model 'anthropic.claude-3-haiku-20240307-v1:0' and describe to me the image that is uploaded", 
+    {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded", 
      "Usecase": "Image-to-Text"},
-    {"Prompt": "use model 'anthropic.claude-3-sonnet-20240229-v1:0' and describe to me the image that is uploaded, then compare the difference with the previous model description ", 
+    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded, then compare the difference with the previous model description ", 
      "Usecase": "Image-to-Text & Comparison"},
 ]
 
 anthropic_prompts2 = [
-    {"Prompt": "use model 'anthropic.claude-3-haiku-20240307-v1:0' and tell me some things that most people are happy for, and afraid of.", 
+    {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and tell me some things that most people are happy for, and afraid of.", 
      "Usecase": "Text Generation"},
-    {"Prompt": "use model 'anthropic.claude-3-sonnet-20240229-v1:0' and write a sonnet about a lost kingdom",
+    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and write a sonnet about a lost kingdom",
      "Usecase": "Text Generation"},
-    {"Prompt": "use model 'anthropic.claude-v2:1' for a summary of the latest climate change research findings",
+    {"Prompt": "use model anthropic.claude-v2:1 for a summary of the latest climate change research findings",
      "Usecase": "Summarization"},
-    {"Prompt": "use model 'anthropic.claude-instant-v1' and give an instant response to: What is the essence of happiness?",
+    {"Prompt": "use model anthropic.claude-instant-v1 and give an instant response to: What is the essence of happiness?",
      "Usecase": "Instant Response"}
 ]
 
@@ -194,9 +194,9 @@ ai21labs_prompts = [
 
 # Displaying the prompts as tables
 st.write("### Anthropic Models")
-st.write("# The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function.")
+st.write("#### The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function IF the mypic.png file is detected in the S3 bucket.")
 st.table(anthropic_prompts1)
-st.write("# Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected.")
+st.write("#### Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected in the S3 bucket.")
 st.table(anthropic_prompts2)
 
 st.write("### Mistral Models")
