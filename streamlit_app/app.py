@@ -139,9 +139,9 @@ st.write("## Model Prompts")
 
 # Anthropic Prompts
 anthropic_prompts1 = [
-    {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded", 
+    {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. Dont ask about the image, because the model function will have the information needed to provide a response.", 
      "Usecase": "Image-to-text"},
-    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded, then compare the difference with the previous model description ", 
+    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded, then compare the difference with the previous model description. Dont ask about the image, because the model function will have the information needed to provide a response.", 
      "Usecase": "Image-to-text & comparison"},
      {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. then from this description, use model stability.stable-diffusion-xl-v1 to create an image.",
       "Usecase": "Image-to-text to text-to-image"}   
