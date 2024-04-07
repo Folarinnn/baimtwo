@@ -20,10 +20,10 @@ def crop_to_circle(image):
 st.title("Call Multiple Models Agent")
 
 # Display a text box for request & engineering prompmt
-engineering_prompt = st.text_input("Engineering prompt (Optional)", max_chars=2000)
+engineering_prompt = st.text_input("Engineering prompt (Optional): ", max_chars=2000)
 engineering_prompt = engineering_prompt.strip()
 
-request_prompt = st.text_input("Please enter the request prompt", max_chars=2000)
+request_prompt = st.text_input("Please enter the request prompt: ", max_chars=2000)
 request_prompt = request_prompt.strip()
 
 # Display a primary button for submission
