@@ -19,9 +19,12 @@ def crop_to_circle(image):
 # Title
 st.title("Call Multiple Models Agent")
 
-# Display a text box for input
-prompt = st.text_input("Please enter your query?", max_chars=2000)
-prompt = prompt.strip()
+# Display a text box for request & engineering prompmt
+engineering_prompt = st.text_input("Engineering prompt (Optional)", max_chars=2000)
+engineering_prompt = engineering_prompt.strip()
+
+request_prompt = st.text_input("Please enter the request prompt", max_chars=2000)
+request_prompt = request_prompt.strip()
 
 # Display a primary button for submission
 submit_button = st.button("Submit", type="primary")
@@ -51,11 +54,15 @@ def format_response(response_body):
         return response_body
 
 # Handling user input and responses
-if submit_button and prompt:
+if submit_button and request_prompt:
+    # Concatenating engineering_prompt with request_prompt if provided
+    combined_prompt = f"{engineering_prompt} - {request_prompt}" if engineering_prompt else request_prompt
+    
     event = {
         "sessionId": "MYSESSION",
-        "question": prompt
+        "question": combined_prompt
     }
+    
     response = agenthelper.lambda_handler(event, None)
     
     try:
@@ -79,8 +86,9 @@ if submit_button and prompt:
 
     # Use trace_data and formatted_response as needed
     st.sidebar.text_area("", value=all_data, height=300)
-    st.session_state['history'].append({"question": prompt, "answer": the_response})
+    st.session_state['history'].append({"question": combined_prompt, "answer": the_response})
     st.session_state['trace_data'] = the_response
+
   
 
 if end_session_button:
@@ -134,7 +142,9 @@ anthropic_prompts1 = [
     {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded", 
      "Usecase": "Image-to-Text"},
     {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded, then compare the difference with the previous model description ", 
-     "Usecase": "Image-to-Text & Comparison"},
+     "Usecase": "Image-to-text & comparison"},
+     {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. then from this description, use model stability.stable-diffusion-xl-v1 to create an image.",
+      "Usecase": "Image-to-text to text-to-image"}   
 ]
 
 anthropic_prompts2 = [
