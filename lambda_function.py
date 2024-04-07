@@ -9,74 +9,118 @@ from PIL import Image
 from botocore.exceptions import ClientError
 from langchain.llms.bedrock import Bedrock
 #from langchain_community.chat_models import BedrockChat
-s3 = boto3.client('s3')
 
+s3 = boto3.client('s3')
 logger = logging.getLogger(__name__)
+bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
+object_name = 'mypic.png' 
 
 def lambda_handler(event, context):
     print(event)
-
+    
     def get_named_parameter(event, name):
         return next(item for item in event['parameters'] if item['name'] == name)['value']
 
     model_id = get_named_parameter(event, 'modelId')
     prompt = get_named_parameter(event, 'prompt')
-    encoded_image = None
     #encoded_image = get_named_parameter(event, 'image')
-
     print("MODE ID: " + model_id)
     print("PROMPT: " + prompt)
 
-    bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
-    object_name = 'mypic.png' 
-
-    try:
-        # Check if the file exists in S3
-        s3.head_object(Bucket=bucket_name, Key=object_name)
-        file_exists = True
-    except ClientError as e:
-        # If a ClientError is thrown, check if it was a 404 error
-        # which means the object does not exist.
-        if e.response['Error']['Code'] == '404':
-            file_exists = False
-        else:
-            # Reraise the exception if it was a different error
-            raise
-
-    if file_exists:
-        # Create a BytesIO object to store image data from S3
-        file_stream = io.BytesIO()
-        s3.download_fileobj(bucket_name, object_name, file_stream)
-
-        # Reset the file pointer to the beginning after download
-        file_stream.seek(0)
-
-        # Directly encode the downloaded image data to base64
-        encoded_image = base64.b64encode(file_stream.getvalue()).decode('utf-8')
-        # Here you can use encoded_image as needed
-        print("File exists and has been encoded.")
-    else:
-        print("File does not exist in the bucket.")
-
-        # Load the image file into a variable
-        #fetched_image = Image.open(file_stream)    
-
-
     def get_image_response(client, prompt_content): #text-to-text client function
         
-        request_body = json.dumps({"text_prompts": 
-                                [ {"text": prompt_content } ], #prompts to use
-                                "cfg_scale": 9, #how closely the model tries to match the prompt
-                                "steps": 50, }) #number of diffusion steps to perform
-        
-        response = client.invoke_model(body=request_body, modelId=model_id) #call the Bedrock endpoint
+        if(model_id.startswith('stability')):
+            request_body = json.dumps({"text_prompts": 
+                                    [ {"text": prompt_content} ], #prompts to use
+                                    "cfg_scale": 9, #how closely the model tries to match the prompt
+                                    "steps": 50, }) #number of diffusion steps to perform
+            try:
+                response = client.invoke_model(body=request_body, modelId=model_id) #call the Bedrock endpoint
+                payload = json.loads(response.get('body').read()) #load the response body into a json object 
+                images = payload.get('artifacts') #extract the image artifacts
+                
+                # Check if images is None or empty
+                if not images or 'base64' not in images[0]:
+                    logging.error("No images found or 'base64' key is missing.")
+                    return "No image data found in the response."
+                
+                image_data = base64.b64decode(images[0].get('base64')) #decode image
+                image = io.BytesIO(image_data) #return a BytesIO object for client app consumption
+                                
+                return image
 
-        payload = json.loads(response.get('body').read()) #load the response body into a json object
-        images = payload.get('artifacts') #extract the image artifacts
-        image_data = base64.b64decode(images[0].get('base64')) #decode image
-        output = io.BytesIO(image_data) #return a BytesIO object for client app consumption
-                    
-        return output
+            except Exception as e:
+                logging.error(f"An error occurred: {str(e)}")
+                return (f"An error occurred processing the image response:  {str(e)}")
+        
+        elif(model_id == 'amazon.titan-image-generator-v1'):           
+            request_body = json.dumps({
+                "taskType": "TEXT_IMAGE",
+                "textToImageParams": {
+                    "text": prompt_content
+                },
+                "imageGenerationConfig": {
+                    "numberOfImages": 2,
+                    "height": 1024,
+                    "width": 1024,
+                    "cfgScale": 8.0,
+                    "seed": 0
+                }
+            })
+
+            def generate_image(model_id, body):
+                """
+                Generate an image using Amazon Titan Image Generator G1 model on demand.
+                Args:
+                    model_id (str): The model ID to use.
+                    body (str) : The request body to use.
+                Returns:
+                    image_bytes (bytes): The image generated by the model.
+                """
+
+                logger.info("Generating image with Amazon Titan Image Generator G1 model %s", model_id)
+                bedrock = boto3.client(service_name='bedrock-runtime')
+                accept = "application/json"
+                content_type = "application/json"
+
+                response = bedrock.invoke_model(
+                    body=body, modelId=model_id, accept=accept, contentType=content_type
+                )
+                response_body = json.loads(response.get("body").read())
+                base64_image = response_body.get("images")[0]
+                base64_bytes = base64_image.encode('ascii')
+                image_bytes = base64.b64decode(base64_bytes)
+                finish_reason = response_body.get("error")
+
+                if finish_reason is not None:
+                    raise ImageError(f"Image generation error. Error is {finish_reason}")
+
+                logger.info(
+                    "Successfully generated image with Amazon Titan Image Generator G1 model %s", model_id)
+
+                return image_bytes
+
+            try:
+                image_bytes = generate_image(model_id=model_id, body=request_body)
+                image = Image.open(io.BytesIO(image_bytes))
+                image.show()
+
+                return image
+
+            except ClientError as err:
+                message = err.response["Error"]["Message"]
+                logger.error("A client error occurred: %s", message)
+                print("A client error occured: " +
+                    format(message))
+            except ImageError as err:
+                logger.error(err.message)
+                print(err.message)
+
+        else:
+            print(
+                f"Finished generating image with Amazon Titan Image Generator G1 model {model_id}.")
+
+
         
     class Claude3Wrapper:
         """Encapsulates Claude 3 model invocations using the Amazon Bedrock Runtime client."""
@@ -170,6 +214,11 @@ def lambda_handler(event, context):
                 logger.error("Couldn't invoke Claude 3 multimodally. Error: %s", err)
                 raise
 
+    class ImageError(Exception):
+        "Custom exception for errors returned by Amazon Titan Image Generator G1"
+
+        def __init__(self, message):
+            self.message = message
 
     def get_inference_parameters(model): #return a default set of parameters based on the model's provider
         bedrock_model_provider = model.split('.')[0] #grab the model provider from the first part of the model id
@@ -193,8 +242,7 @@ def lambda_handler(event, context):
                 "countPenalty": {"scale": 0 }, 
                 "presencePenalty": {"scale": 0 }, 
                 "frequencyPenalty": {"scale": 0 } 
-            }
-        
+            }    
         elif (bedrock_model_provider == 'cohere'): #COHERE
             #example modelID: cohere.command-text-v14
             return {
@@ -204,16 +252,14 @@ def lambda_handler(event, context):
                 "k": 0,
                 "stop_sequences": [],
                 "return_likelihoods": "NONE"
-            }
-        
+            }   
         elif (bedrock_model_provider == 'meta'): #META
             #example modelID: meta.llama2-70b-chat-v1
             return {
                 "temperature": 0,
                 "top_p": 0.9,
                 "max_gen_len": 512
-            }
-        
+            }  
         elif (bedrock_model_provider == 'stability'): #META
             #example modelID: stability.stable-diffusion-xl-v0
             return {
@@ -223,8 +269,7 @@ def lambda_handler(event, context):
                 "steps": 50,
                 "width": 512,
                 "height": 512
-            }        
-        
+            }         
         elif(bedrock_model_provider == 'anthropic'): #Anthropic
             #example modelID: openai.gpt-3.5-turbo
             return { 
@@ -235,7 +280,22 @@ def lambda_handler(event, context):
                 "stop_sequences": ["\n\nHuman:"],
                 "anthropic_version": "bedrock-2023-05-31" 
             }
-
+        elif(model_id == 'amazon.titan-image-generator-v1'):
+            #example modelID: anthropic.claude-3-haiku-20240307-v1:0
+            return {
+                "taskType": "TEXT_IMAGE",
+                "textToImageParams": {
+                    "text": "string",      
+                    "negativeText": "string"
+                },
+                "imageGenerationConfig": {
+                    "numberOfImages": int,
+                    "height": int,
+                    "width": int,
+                    "cfgScale": float,
+                    "seed": int
+                }
+            }
         else: #Amazon
             #For the LangChain Bedrock implementation, these parameters will be added to the 
             #textGenerationConfig item that LangChain creates for us
@@ -246,66 +306,104 @@ def lambda_handler(event, context):
                 "topP": 0.9 
             }
         
-
     def get_text_response(model_id, prompt):
         client = boto3.client(service_name="bedrock-runtime", region_name=os.environ.get("BWB_REGION_NAME"))
+        encoded_image = None
+
+        try:
+            # Check if the file exists in S3
+            s3.head_object(Bucket=bucket_name, Key=object_name)
+            file_exists = True
+        except ClientError as e:
+            # If a ClientError is thrown, check if it was a 404 error
+            # which means the object does not exist.
+            if e.response['Error']['Code'] == '404':
+                file_exists = False
+            else:
+                # Reraise the exception if it was a different error
+                raise
+
+        if file_exists:
+            # Create a BytesIO object to store image data from S3
+            file_stream = io.BytesIO()
+            s3.download_fileobj(bucket_name, object_name, file_stream)
+
+            # Reset the file pointer to the beginning after download
+            file_stream.seek(0)
+
+            # Directly encode the downloaded image data to base64
+            encoded_image = base64.b64encode(file_stream.getvalue()).decode('utf-8')
+            # Here you can use encoded_image as needed
+            print("File exists and has been encoded.")
+        else:
+            print("File does not exist in the bucket.")
+
+            # Load the image file into a variable
+            #fetched_image = Image.open(file_stream)   
 
         if model_id == 'anthropic.claude-3-haiku-20240307-v1:0' or model_id == 'anthropic.claude-3-sonnet-20240229-v1:0':
-            # Invoke Claude 3 with text
+            # Invoke Claude 3 with text to text
             wrapper = Claude3Wrapper(client)
             if not encoded_image:
                 return wrapper.invoke_claude_3_with_text(prompt)
             else:
+                # Invoke Claude 3 with image to text
                 return wrapper.invoke_claude_3_multimodal(prompt, encoded_image)
             
-        elif model_id.startswith('stability'):  # Check if it's a "stability" model
+        elif model_id.startswith('stability') or model_id == ('amazon.titan-image-generator-v1'): 
             wrapper = Claude3Wrapper()
-            image_response = get_image_response(wrapper.client, prompt)  # Pass wrapper.client
-            
-            def save_image_to_s3(image_bytes, bucket, object_name):
+
+            def save_image_to_s3(image, bucket, object_name):
                 """
-                Saves an image (provided as bytes) to an S3 bucket.
-                
+                Saves an image (provided as a PIL Image object) to an S3 bucket.
+
                 Args:
-                - image_bytes: BytesIO object containing image data.
+                - image: PIL Image object containing image data.
                 - bucket: Name of the S3 bucket.
                 - object_name: S3 object name under which the image will be saved.
                 """
-                # Convert BytesIO object to bytes if not already in bytes format
-                if isinstance(image_bytes, io.BytesIO):
-                    image_bytes = image_bytes.getvalue()
-                
+                # Create a BytesIO object to save the image
+                image_bytes = io.BytesIO()
+                # Save the image to the BytesIO object (ensure format is specified as needed, e.g., 'PNG')
+                image.save(image_bytes, format='PNG')
+                # Move the cursor to the beginning of the BytesIO object
+                image_bytes.seek(0)
+
                 # Upload the image to S3
                 s3.put_object(Bucket=bucket, Key=object_name, Body=image_bytes)
                 print(f"Image successfully saved to s3://{bucket}/{object_name}")
 
                 return f"Image successfully saved to s3://{bucket}/{object_name}"
 
-            image_response = get_image_response(wrapper.client, prompt)
-            # Define an appropriate object name based on your naming convention
+
+            image_response = get_image_response(wrapper.client, prompt)  # Pass wrapper.client
+
             # e.g., using a timestamp or a unique identifier to avoid name collisions
-            object_name = 'generated_images/image_{}.png'.format(int(time.time()))      
+            generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))      
 
             # Save the generated image to S3
-            save_image_to_s3(image_response, bucket_name, object_name)
+            save_image_to_s3(image_response, bucket_name, generated_object_name)
+            
+            return "Image saved to S3: {}/{}".format(bucket_name, generated_object_name)
 
-            return "Image saved to S3: {}/{}".format(bucket_name, object_name)
-
-                 
         else:
             model_kwargs = get_inference_parameters(model_id)
             llm = Bedrock(
                 credentials_profile_name=os.environ.get("BWB_PROFILE_NAME"),
                 region_name=os.environ.get("BWB_REGION_NAME"),
                 endpoint_url=os.environ.get("BWB_ENDPOINT_URL"),
-                model_id=model_id,
+                modelId=model_id,
                 model_kwargs=model_kwargs
             )
             return llm.predict(prompt)
 
-    # Main execution
-    response = get_text_response(model_id, prompt)
-    print(response)
+    try:
+        # Main execution
+        response = get_text_response(model_id, prompt)
+        print(response)
+    except ClientError as e:
+        response = (f"An error occurred processing the text response:  {str(e)}")
+        # Prepare a response indicating a request error
 
 
 
