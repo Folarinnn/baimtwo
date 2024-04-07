@@ -149,21 +149,21 @@ anthropic_prompts1 = [
 
 anthropic_prompts2 = [
     {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and tell me some things that most people are happy for, and afraid of.", 
-     "Usecase": "Text Generation"},
+     "Usecase": "Text generation"},
     {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and write a sonnet about a lost kingdom",
-     "Usecase": "Text Generation"},
+     "Usecase": "Text generation"},
     {"Prompt": "use model anthropic.claude-v2:1 for a summary of the latest climate change research findings",
      "Usecase": "Summarization"},
     {"Prompt": "use model anthropic.claude-instant-v1 and give an instant response to: What is the essence of happiness?",
-     "Usecase": "Instant Response"}
+     "Usecase": "Instant response"}
 ]
 
 # Mistral Prompts
 mistral_prompts = [
     {"Prompt": "Use model mistral.mistral-large-2402-v1:0. [INST]Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it: '{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}'[/INST]",
-     "Usecase": "Problem Solving"},
+     "Usecase": "Problem solving"},
     {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me in Bash, how do I list all text files in the current directory (excluding subdirectories) that have been modified in the last month?",
-     "Usecase": "Code Generation"},
+     "Usecase": "Code generation"},
     {"Prompt": "What is the difference between inorder and preorder traversal? Give an example in Python.",
      "Usecase": "Q&A and Code Generation"},
     {"Prompt": "Use model mistral.mixtral-8x7b-instruct-v0:1. What is your favourite condiment? Well, I'm quite partial to a good squeeze of fresh lemon juice. It adds just the right amount of zesty flavour to whatever I'm cooking up in the kitchen! Do you have mayonnaise recipes?",
@@ -175,35 +175,37 @@ meta_prompts = [
     {"Prompt": "use model meta.llama2-13b-chat-v1 and figure out the following: You are a very intelligent bot with exceptional critical thinking. I went to the market and bought 10 apples. I gave 2 apples to your friend and 2 to the helper. I then went and bought 5 more apples and ate 1. How many apples did I remain with? Provide step by step how you solved it.",
      "Usecase": "Math"},
     {"Prompt": "now use model meta.llama2-70b-chat-v1 and figure out the following: You are a very intelligent bot with exceptional critical thinking. I went to the market and bought 10 apples. I gave 2 apples to your friend and 2 to the helper. I then went and bought 5 more apples and ate 1. How many apples did I remain with? Provide step by step how you solved it. Then, compare it with the previous answer.",
-     "Usecase": "Math & Compare Models"}
+     "Usecase": "Math & compare models"}
 ]
 
 # Amazon Prompts
 amazon_prompts = [
+    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me an image of a strong lion with a crown on its head in the desert.",
+     "Usecase": "Text-to-image"},
     {"Prompt": "Use model amazon.titan-text-express-v1. Meeting transcript is the following - Miguel: Hi Brant, I want to discuss the workstream for our new product launch Brant: Sure Miguel, is there anything in particular you want to discuss? Miguel: Yes, I want to talk about how users enter into the product. Brant: Ok, in that case let me add in Namita. Namita: Hey everyone Brant: Hi Namita, Miguel wants to discuss how users enter into the product. Miguel: its too complicated and we should remove friction. for example, why do I need to fill out additional forms? I also find it difficult to find where to access the product when I first land on the landing page. Brant: I would also add that I think there are too many steps. Namita: Ok, I can work on the landing page to make the product more discoverable but brant can you work on the additional forms? Brant: Yes but I would need to work with James from another team as he needs to unblock the sign up workflow. Miguel can you document any other concerns so that I can discuss with James only once? Miguel: Sure. - From the meeting transcript above, Create a list of action items for each person.",
      "Usecase": "Summarization"},
-    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me an image of a strong lion with a crown on its head in the desert.",
-     "Usecase": "Text-to-image"}
+    {"Prompt": "Product: Sunglasses. Keywords: polarized, designer, comfortable, UV protection, aviators. Create a table that contains five variations of a detailed product description for the product listed above, each variation of the product description must use all the keywords listed.",
+     "Usecase": "Open ended text generation"}
 ]
 
 # Cohere Prompts
 cohere_prompts = [
     {"Prompt": "Use model cohere.command-text-v14. Extract the band name from the contract: This Music Recording Agreement (Agreement) is made effective as of the 13 day of December, 2021 by and between Good Kid, a Toronto-based musical group (Artist) and Universal Music Group, a record label with license number 545345 (Recording Label). Artist and Recording Label may each be referred to in this Agreement individually as a Party and collectively as the Parties. Work under this Agreement shall begin on March 15, 2022.",
-     "Usecase": "Open-ended Text Generation"}
+     "Usecase": "Open ended text generation"}
 ]
 
 # Stability AI Prompts
 stability_ai_prompts = [
     {"Prompt": "Use model stability.stable-diffusion-xl-v0. Create an image of a cowboy riding a dinosaur on the moon.",
-     "Usecase": "Create Image"},
+     "Usecase": "Create image"},
     {"Prompt": "Use model stability.stable-diffusion-xl-v1. Create an image of a human-like person working in the middle of California.",
-     "Usecase": "Create Image"}
+     "Usecase": "Create image"}
 ]
 
 # AI21labs Prompts
 ai21labs_prompts = [
     {"Prompt": "Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in writing Google ads. You are tasked to write a persuasive and personalized Google ad based on a company name and a short description. You need to write the Headline and the content of the Ad itself. For example: Company: Upwork Description: Freelancer marketplace Headline: Upwork: Hire The Best - Trust Your Job To True Experts Ad: Connect your business to Expert professionals & agencies with specialized talent. Post a job today to access Upwork's talent pool of quality professionals & agencies. Grow your team fast. 90% of customers rehire. Trusted by 5M+ businesses. Secure payments. - Write a persuasive and personalized Google ad for the following company. Company: Click Description: SEO services",
-     "Usecase": "Text Generation"}
+     "Usecase": "Text generation"}
 ]
 
 # Displaying the prompts as tables
