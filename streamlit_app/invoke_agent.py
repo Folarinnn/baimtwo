@@ -154,7 +154,7 @@ def decode_response(response):
 def lambda_handler(event, context):
     
     agentId = "EKVDUAOMF6" #INPUT YOUR AGENT ID HERE
-    agentAliasId = "S7UN0QVQGS" # Hits draft alias, set to a specific alias id for a deployed version
+    agentAliasId = "IR9JRICHQ9" # Hits draft alias, set to a specific alias id for a deployed version
     sessionId = event["sessionId"]
     question = event["question"]
     endSession = False
