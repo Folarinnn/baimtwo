@@ -215,21 +215,29 @@ knowledge_base_model_promt = [
      "Usecase": "RAG"}
 ]
 
-# Displaying the prompts as tables
-st.write("### Anthropic Models")
-st.write("#### The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function IF the mypic.png file is detected in the S3 bucket.")
-st.table(anthropic_prompts1)
-st.write("#### Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected in the S3 bucket. If not, the response will vary.")
-st.table(anthropic_prompts2)
+image_generate_and_rate_prompt = [
+    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me a pie chart that shows a 70 percent sales growth. Use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded. Dont ask about the image, because the model function will have the information needed to provide a response. Then use the same model to give me a confidence score and explain your reasoning",
+     "Usecase": "Image generation & rating"}
+]
 
-st.write("### Mistral Models")
-st.table(mistral_prompts)
+
+
+# Displaying the prompts as tables
 
 st.write("### Amazon Models")
 st.table(amazon_prompts)
 
 st.write("### Stability AI Models")
 st.table(stability_ai_prompts)
+
+st.write("### Anthropic Models")
+st.write("#### The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function IF the mypic.png file is detected in the S3 bucket.")
+st.table(anthropic_prompts1)
+st.write("#### Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected in the S3 bucket. If not, the response may have descrepency.")
+st.table(anthropic_prompts2)
+
+st.write("### Mistral Models")
+st.table(mistral_prompts)
 
 st.write("### Meta Models")
 st.table(meta_prompts)
@@ -239,6 +247,9 @@ st.table(cohere_prompts)
 
 st.write("### AI21labs Models")
 st.table(ai21labs_prompts)
+
+st.write("### Amazon & Claude Model")
+st.table(image_generate_and_rate_prompt)
 
 st.write("### RAG & Amazon Model")
 st.table(knowledge_base_model_promt)

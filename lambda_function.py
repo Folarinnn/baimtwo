@@ -13,7 +13,7 @@ from langchain.llms.bedrock import Bedrock
 s3 = boto3.client('s3')
 logger = logging.getLogger(__name__)
 bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
-object_name = 'mypic.png' 
+object_name = 'generated_pic.png' 
 
 def lambda_handler(event, context):
     print(event)
@@ -364,7 +364,8 @@ def lambda_handler(event, context):
                 print(f"Image successfully saved to s3://{bucket}/{object_name}")
 
             image_response = get_image_response(client, prompt)
-            generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))      
+            #generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))
+            generated_object_name = object_name       
             save_image_to_s3(image_response, bucket_name, generated_object_name)
             return "Stability image created and saved successfully"
 
@@ -382,7 +383,8 @@ def lambda_handler(event, context):
 
             # Your existing code to get and process the image
             image_response = get_image_response(client, prompt)  # Assuming this returns a PIL Image object
-            generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))      
+            #generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))  
+            generated_object_name = object_name 
             save_image_to_s3(image_response, bucket_name, generated_object_name)
             return "Amazon image created and saved successfully"
 
