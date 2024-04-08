@@ -18,9 +18,11 @@ import sys
 #echo $AWS_SESSION_TOKEN
 
 
-#os.environ["AWS_PROFILE"] = "agent-demo"
-theRegion = "us-west-2"
-os.environ["AWS_REGION"] = theRegion
+agentId = "EKVDUAOMF6" #INPUT YOUR AGENT ID HERE
+agentAliasId = "QLZ56GKTBG" # Hits draft alias, set to a specific alias id for a deployed version
+os.environ["AWS_REGION"] = "us-west-2"
+
+theRegion = os.environ["AWS_REGION"]
 region = os.environ.get("AWS_REGION")
 llm_response = ""
 
@@ -152,9 +154,6 @@ def decode_response(response):
 
 
 def lambda_handler(event, context):
-    
-    agentId = "EKVDUAOMF6" #INPUT YOUR AGENT ID HERE
-    agentAliasId = "QLZ56GKTBG" # Hits draft alias, set to a specific alias id for a deployed version
     sessionId = event["sessionId"]
     question = event["question"]
     endSession = False

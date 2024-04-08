@@ -164,7 +164,7 @@ mistral_prompts = [
      "Usecase": "Problem solving"},
     {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me in Bash, how do I list all text files in the current directory (excluding subdirectories) that have been modified in the last month?",
      "Usecase": "Code generation"},
-    {"Prompt": "What is the difference between inorder and preorder traversal? Give an example in Python.",
+    {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me hat is the difference between inorder and preorder traversal? Give an example in Python.",
      "Usecase": "Q&A and Code Generation"},
     {"Prompt": "Use model mistral.mixtral-8x7b-instruct-v0:1. What is your favourite condiment? Well, I'm quite partial to a good squeeze of fresh lemon juice. It adds just the right amount of zesty flavour to whatever I'm cooking up in the kitchen! Do you have mayonnaise recipes?",
      "Usecase": "Q & A - Create recipe"}
