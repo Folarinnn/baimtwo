@@ -350,45 +350,42 @@ def lambda_handler(event, context):
                 # Invoke Claude 3 with image to text
                 return wrapper.invoke_claude_3_multimodal(prompt, encoded_image)
             
-        elif model_id.startswith('stability') or model_id == ('amazon.titan-image-generator-v1'): 
-            wrapper = Claude3Wrapper()
-
+        # Conditional check for model_id starting with 'stability'
+        elif model_id.startswith('stability'):
             def save_image_to_s3(image_bytes_io, bucket, object_name):
                 """
-                Saves an image (provided as a BytesIO object) to an S3 bucket.
-
-                Args:
-                - image_bytes_io: io.BytesIO object containing image data.
-                - bucket: Name of the S3 bucket.
-                - object_name: S3 object name under which the image will be saved.
+                Saves an image (provided as a BytesIO object) to an S3 bucket for 'stability' models.
                 """
-                # Convert BytesIO to PIL Image
                 image = Image.open(image_bytes_io)
-
-                # Create a new BytesIO object to save the image
                 output_image_bytes = io.BytesIO()
-                # Save the image to the new BytesIO object in PNG format
                 image.save(output_image_bytes, format='PNG')
-                # Move the cursor to the beginning of the BytesIO object
                 output_image_bytes.seek(0)
-
-                # Upload the image to S3
                 s3.put_object(Bucket=bucket, Key=object_name, Body=output_image_bytes.getvalue())
                 print(f"Image successfully saved to s3://{bucket}/{object_name}")
 
-                return f"Image successfully saved to s3://{bucket}/{object_name}"
-
-
-
-            image_response = get_image_response(wrapper.client, prompt)  # Pass wrapper.client
-
-            # e.g., using a timestamp or a unique identifier to avoid name collisions
+            image_response = get_image_response(client, prompt)
             generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))      
-
-            # Save the generated image to S3
             save_image_to_s3(image_response, bucket_name, generated_object_name)
-            
-            return "Image saved to S3: {}/{}".format(bucket_name, generated_object_name)
+            return "Stability image created and saved successfully"
+
+        # Conditional check for model_id equal to 'amazon.titan-image-generator-v1'
+        elif model_id == 'amazon.titan-image-generator-v1':
+            def save_image_to_s3(image, bucket, object_name):
+                """
+                Saves an image (provided as a PIL Image object) to an S3 bucket for 'amazon.titan-image-generator-v1' models.
+                """
+                image_bytes = io.BytesIO()
+                image.save(image_bytes, format='PNG')
+                image_bytes.seek(0)
+                s3.put_object(Bucket=bucket, Key=object_name, Body=image_bytes)
+                print(f"Image successfully saved to s3://{bucket}/{object_name}")
+
+            # Your existing code to get and process the image
+            image_response = get_image_response(client, prompt)  # Assuming this returns a PIL Image object
+            generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))      
+            save_image_to_s3(image_response, bucket_name, generated_object_name)
+            return "Amazon image created and saved successfully"
+
 
         else:
             model_kwargs = get_inference_parameters(model_id)

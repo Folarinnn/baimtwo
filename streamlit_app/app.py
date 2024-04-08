@@ -180,7 +180,7 @@ meta_prompts = [
 
 # Amazon Prompts
 amazon_prompts = [
-    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me an image of a strong lion with a crown on its head in the desert.",
+    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me an image of a lion with a crown on its head in the middle of california.",
      "Usecase": "Text-to-image"},
     {"Prompt": "Use model amazon.titan-text-express-v1. Meeting transcript is the following - Miguel: Hi Brant, I want to discuss the workstream for our new product launch Brant: Sure Miguel, is there anything in particular you want to discuss? Miguel: Yes, I want to talk about how users enter into the product. Brant: Ok, in that case let me add in Namita. Namita: Hey everyone Brant: Hi Namita, Miguel wants to discuss how users enter into the product. Miguel: its too complicated and we should remove friction. for example, why do I need to fill out additional forms? I also find it difficult to find where to access the product when I first land on the landing page. Brant: I would also add that I think there are too many steps. Namita: Ok, I can work on the landing page to make the product more discoverable but brant can you work on the additional forms? Brant: Yes but I would need to work with James from another team as he needs to unblock the sign up workflow. Miguel can you document any other concerns so that I can discuss with James only once? Miguel: Sure. - From the meeting transcript above, Create a list of action items for each person.",
      "Usecase": "Summarization"},
@@ -206,6 +206,11 @@ stability_ai_prompts = [
 ai21labs_prompts = [
     {"Prompt": "Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in writing Google ads. You are tasked to write a persuasive and personalized Google ad based on a company name and a short description. You need to write the Headline and the content of the Ad itself. For example: Company: Upwork Description: Freelancer marketplace Headline: Upwork: Hire The Best - Trust Your Job To True Experts Ad: Connect your business to Expert professionals & agencies with specialized talent. Post a job today to access Upwork's talent pool of quality professionals & agencies. Grow your team fast. 90% of customers rehire. Trusted by 5M+ businesses. Secure payments. - Write a persuasive and personalized Google ad for the following company. Company: Click Description: SEO services",
      "Usecase": "Text generation"}
+]
+
+knowledge_base_model_promt = [
+    {"Prompt": "Provide me information about inflation and rising prices from the reports. Then use model amazon.titan-image-generator-v1 to generate what a group of people would look like telling you this news.",
+     "Usecase": "RAG & Image generation"}
 ]
 
 # Displaying the prompts as tables
@@ -234,4 +239,6 @@ st.table(stability_ai_prompts)
 st.write("### AI21labs Models")
 st.table(ai21labs_prompts)
 
+st.write("### RAG & Amazon Model")
+st.table(knowledge_base_model_promt)
 
