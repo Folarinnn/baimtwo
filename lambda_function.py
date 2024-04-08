@@ -353,27 +353,31 @@ def lambda_handler(event, context):
         elif model_id.startswith('stability') or model_id == ('amazon.titan-image-generator-v1'): 
             wrapper = Claude3Wrapper()
 
-            def save_image_to_s3(image, bucket, object_name):
+            def save_image_to_s3(image_bytes_io, bucket, object_name):
                 """
-                Saves an image (provided as a PIL Image object) to an S3 bucket.
+                Saves an image (provided as a BytesIO object) to an S3 bucket.
 
                 Args:
-                - image: PIL Image object containing image data.
+                - image_bytes_io: io.BytesIO object containing image data.
                 - bucket: Name of the S3 bucket.
                 - object_name: S3 object name under which the image will be saved.
                 """
-                # Create a BytesIO object to save the image
-                image_bytes = io.BytesIO()
-                # Save the image to the BytesIO object (ensure format is specified as needed, e.g., 'PNG')
-                image.save(image_bytes, format='PNG')
+                # Convert BytesIO to PIL Image
+                image = Image.open(image_bytes_io)
+
+                # Create a new BytesIO object to save the image
+                output_image_bytes = io.BytesIO()
+                # Save the image to the new BytesIO object in PNG format
+                image.save(output_image_bytes, format='PNG')
                 # Move the cursor to the beginning of the BytesIO object
-                image_bytes.seek(0)
+                output_image_bytes.seek(0)
 
                 # Upload the image to S3
-                s3.put_object(Bucket=bucket, Key=object_name, Body=image_bytes)
+                s3.put_object(Bucket=bucket, Key=object_name, Body=output_image_bytes.getvalue())
                 print(f"Image successfully saved to s3://{bucket}/{object_name}")
 
                 return f"Image successfully saved to s3://{bucket}/{object_name}"
+
 
 
             image_response = get_image_response(wrapper.client, prompt)  # Pass wrapper.client

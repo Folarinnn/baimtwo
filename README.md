@@ -22,14 +22,14 @@ This project is intended to be a baseline for developers to extend there use cas
 - mistral.mistral-7b-instruct-v0:2
 - mistral.mixtral-8x7b-instruct-v0:1
 
-### Meta: Llama models
-- meta.llama2-13b-chat-v1
-- meta.llama2-70b-chat-v1
-
 ### Amazon: Titan Models
 - amazon.titan-text-lite-v1
 - amazon.titan-text-express-v1
 - amazon.titan-image-generator-v1 (in preview)
+
+### Meta: Llama models
+- meta.llama2-13b-chat-v1
+- meta.llama2-70b-chat-v1
 
 ### Cohere: Command Models
 - cohere.command-text-v14
@@ -50,8 +50,9 @@ This project is intended to be a baseline for developers to extend there use cas
 
 ## Configuration and Setup
 
-### Step 1: install and run Docker
+### Step 1: Setup Amazon Cloud9. Then, install and run Docker
 -
+
 
 ### Step 2: Creating an S3 Bucket
 - This step will be required in order to do image-to-text and text-to-image inference calls to certain models.
