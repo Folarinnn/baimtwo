@@ -188,18 +188,20 @@ amazon_prompts = [
      "Usecase": "Open ended text generation"}
 ]
 
+# Stability AI Prompts
+stability_ai_prompts = [
+    {"Prompt": "Use model stability.stable-diffusion-xl-v0. Create an image of a cowboy riding a dinosaur on the moon.",
+     "Usecase": "Text-to-image"},
+    {"Prompt": "Use model stability.stable-diffusion-xl-v1 to generate what a group of people would look like upset in the middle of an arena.",
+     "Usecase": "Text-to-image"},
+    {"Prompt": "Use model stability.stable-diffusion-xl-v1. Create an image of a human-like person working in the middle of California.",
+     "Usecase": "Create image"}
+]
+
 # Cohere Prompts
 cohere_prompts = [
     {"Prompt": "Use model cohere.command-text-v14. Extract the band name from the contract: This Music Recording Agreement (Agreement) is made effective as of the 13 day of December, 2021 by and between Good Kid, a Toronto-based musical group (Artist) and Universal Music Group, a record label with license number 545345 (Recording Label). Artist and Recording Label may each be referred to in this Agreement individually as a Party and collectively as the Parties. Work under this Agreement shall begin on March 15, 2022.",
      "Usecase": "Open ended text generation"}
-]
-
-# Stability AI Prompts
-stability_ai_prompts = [
-    {"Prompt": "Use model stability.stable-diffusion-xl-v0. Create an image of a cowboy riding a dinosaur on the moon.",
-     "Usecase": "Create image"},
-    {"Prompt": "Use model stability.stable-diffusion-xl-v1. Create an image of a human-like person working in the middle of California.",
-     "Usecase": "Create image"}
 ]
 
 # AI21labs Prompts
@@ -209,32 +211,31 @@ ai21labs_prompts = [
 ]
 
 knowledge_base_model_promt = [
-    {"Prompt": "Provide me information about inflation and rising prices from the reports. Then use model amazon.titan-image-generator-v1 to generate what a group of people would look like telling you this news.",
-     "Usecase": "RAG & Image generation"}
+    {"Prompt": "Provide me a description about inflation and rising prices from the FOMC reports. Then use model amazon.titan-image-generator-v1 to generate what a group of people would look like based on this description.",
+     "Usecase": "RAG"}
 ]
 
 # Displaying the prompts as tables
 st.write("### Anthropic Models")
 st.write("#### The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function IF the mypic.png file is detected in the S3 bucket.")
 st.table(anthropic_prompts1)
-st.write("#### Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected in the S3 bucket.")
+st.write("#### Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected in the S3 bucket. If not, the response will vary.")
 st.table(anthropic_prompts2)
 
 st.write("### Mistral Models")
 st.table(mistral_prompts)
 
-# Displaying the prompts as tables for each provider
 st.write("### Amazon Models")
 st.table(amazon_prompts)
+
+st.write("### Stability AI Models")
+st.table(stability_ai_prompts)
 
 st.write("### Meta Models")
 st.table(meta_prompts)
 
 st.write("### Cohere Models")
 st.table(cohere_prompts)
-
-st.write("### Stability AI Models")
-st.table(stability_ai_prompts)
 
 st.write("### AI21labs Models")
 st.table(ai21labs_prompts)
