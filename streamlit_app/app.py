@@ -25,7 +25,7 @@ st.title("Call Multiple Models Agent")
 engineering_prompt = st.text_input("Engineering prompt (Optional): ", max_chars=2000)
 engineering_prompt = engineering_prompt.strip()
 
-request_prompt = st.text_input("Please enter the request prompt: ", max_chars=2000)
+request_prompt = st.text_input("Please enter the request prompt: ", max_chars=10000)
 request_prompt = request_prompt.strip()
 
 # Display a primary button for submission
@@ -70,7 +70,7 @@ if submit_button and request_prompt:
     combined_prompt = f"{request_prompt} - {engineering_prompt}" if engineering_prompt else request_prompt
     
     event = {
-        "sessionId": "MYSESSION",
+        "sessionId": "MYSESSION2",
         "question": combined_prompt
     }
     
@@ -100,12 +100,12 @@ if submit_button and request_prompt:
     st.session_state['history'].append({"question": combined_prompt, "answer": the_response})
     st.session_state['trace_data'] = the_response
 
-  
+submit_button2 = st.button("Delete Image", type="primary")
 
 if end_session_button:
     st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
     event = {
-        "sessionId": "MYSESSION",
+        "sessionId": "MYSESSION2",
         "question": "placeholder to end session",
         "endSession": True
     }
@@ -149,15 +149,20 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
             st.markdown(formatted_answer, unsafe_allow_html=True)
 
 
+# Add a delete button
+if submit_button2:
+    # Call the delete function
+    agenthelper.delete_file_from_s3('bedrock-agent-images', 'generated_pic.png')
+    st.success('Generated image deleted successfully.')
 
 # Example Prompts Section
 st.write("## Model Prompts")
 
 # Anthropic Prompts
 anthropic_prompts1 = [
-    {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. Dont ask about the image, because the model function will have the information needed to provide a response.", 
+    {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. The model function will have the information needed to provide a response. So, dont ask about the image.", 
      "Usecase": "Image-to-text"},
-    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded, then compare the difference with the previous model description. Dont ask about the image, because the model function will have the information needed to provide a response.", 
+    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded, then compare the difference with the previous model description. The model function will have the information needed to provide a response. So, dont ask about the image.", 
      "Usecase": "Image-to-text & comparison"},
      {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. then from this description, use model stability.stable-diffusion-xl-v1 to create an image.",
       "Usecase": "Image-to-text to text-to-image"}   
@@ -176,11 +181,11 @@ anthropic_prompts2 = [
 
 # Mistral Prompts
 mistral_prompts = [
-    {"Prompt": "Use model mistral.mistral-large-2402-v1:0. [INST]Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it: '{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}'[/INST]",
+    {"Prompt": "Use model mistral.mistral-large-2402-v1:0. Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it: [INST]'{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}'[/INST]",
      "Usecase": "Problem solving"},
     {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me in Bash, how do I list all text files in the current directory (excluding subdirectories) that have been modified in the last month?",
      "Usecase": "Code generation"},
-    {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me hat is the difference between inorder and preorder traversal? Give an example in Python.",
+    {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me what is the difference between inorder and preorder traversal? Give an example in Python.",
      "Usecase": "Q&A and Code Generation"},
     {"Prompt": "Use model mistral.mixtral-8x7b-instruct-v0:1. What is your favourite condiment? Well, I'm quite partial to a good squeeze of fresh lemon juice. It adds just the right amount of zesty flavour to whatever I'm cooking up in the kitchen! Do you have mayonnaise recipes?",
      "Usecase": "Q & A - Create recipe"}
@@ -210,8 +215,8 @@ stability_ai_prompts = [
      "Usecase": "Text-to-image"},
     {"Prompt": "Use model stability.stable-diffusion-xl-v1 to generate what a group of people would look like upset in the middle of an arena.",
      "Usecase": "Text-to-image"},
-    {"Prompt": "Use model stability.stable-diffusion-xl-v1. Create an image of a human-like person working in the middle of California.",
-     "Usecase": "Create image"}
+    {"Prompt": "Use model stability.stable-diffusion-xl-v1. Create an image of a hard working person in front of a food market.",
+     "Usecase": "Text-to-image"}
 ]
 
 # Cohere Prompts

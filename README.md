@@ -3,6 +3,16 @@
 ## Introduction
 This project is intended to be a baseline for developers to extend there use cases with Amazon Bedrock agents across most available models in Bedrock. This README will guide you through setting this up step by step to empower you to further explore the capabilities of Bedrock agents. 
 
+## Use cases for this project
+- Multiple model result comparison
+- Text generation 
+- Summarization
+- Text-to-image
+- Image-to-text
+- Problem solving
+- Q&A
+- RAG (optional)
+
 
 ## Prerequisites
 - An active AWS Account.
@@ -50,8 +60,13 @@ This project is intended to be a baseline for developers to extend there use cas
 
 ## Configuration and Setup
 
-### Step 1: Setup Amazon Cloud9. Then, install and run Docker
--
+### Step 1: Download project. Setup & run Docker
+- We will need to run Docker in order to create a docker container image that will be used for our Lambda function. This function will be used with the action group of the agent in order to infer models. 
+
+- Download the project from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/archive/refs/heads/main.zip). Once downloaded, please open up the project in your IDE of choice. For this project, I will be using [Visual Studio code](https://code.visualstudio.com/docs/sourcecontrol/intro-to-git)
+
+- Open a terminal at the root directory of the project `bedrock-agent-call-multiple-models`
+
 
 
 ### Step 2: Creating an S3 Bucket

@@ -1,3 +1,4 @@
+import boto3
 from boto3.session import Session
 from botocore.auth import SigV4Auth
 from botocore.awsrequest import AWSRequest
@@ -25,6 +26,7 @@ os.environ["AWS_REGION"] = "us-west-2"
 theRegion = os.environ["AWS_REGION"]
 region = os.environ.get("AWS_REGION")
 llm_response = ""
+s3 = boto3.client('s3')
 
 def sigv4_request(
     url,
@@ -87,9 +89,16 @@ def askQuestion(question, url, endSession=False):
         },
         region=theRegion,
         body=json.dumps(myobj)
-    )
-    
+    ) 
     return decode_response(response)
+
+
+def delete_file_from_s3(bucket_name, object_name):
+    try:
+        s3.delete_object(Bucket=bucket_name, Key=object_name)
+        print(f"File {object_name} deleted successfully from bucket {bucket_name}.")
+    except Exception as e:
+        print(f"Error deleting file {object_name} from bucket {bucket_name}: {str(e)}")
 
 
 def decode_response(response):
