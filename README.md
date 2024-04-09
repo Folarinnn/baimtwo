@@ -68,7 +68,7 @@ This project is intended to be a baseline for developers to extend there use cas
 
 -Log into the management console, and search ECR in the search bar at the top. Select the service, then `Create repository`.
 
-![ecr btn](images/ecr_create_btn.png)
+![ecr btn](streamlit_app/images/ecr_create_btn.png)
 
 
 ### Step 2: Download project. Setup & run Docker
