@@ -46,7 +46,7 @@ def format_link(text):
     # Regular expression to find URLs
     url_pattern = r'(https?://\S+)'
     # Replace URLs in the text with Markdown links using "link" as the display text
-    formatted_text = re.sub(url_pattern, r'[Generated Image Link](\1)', text)
+    formatted_text = re.sub(url_pattern, r'[Click here](\1)', text)
     return formatted_text
 
 
