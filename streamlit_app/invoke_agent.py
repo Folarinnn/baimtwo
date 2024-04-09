@@ -19,7 +19,7 @@ import sys
 
 
 agentId = "EKVDUAOMF6" #INPUT YOUR AGENT ID HERE
-agentAliasId = "QLZ56GKTBG" # Hits draft alias, set to a specific alias id for a deployed version
+agentAliasId = "1FEGLLFB3L" # Hits draft alias, set to a specific alias id for a deployed version
 os.environ["AWS_REGION"] = "us-west-2"
 
 theRegion = os.environ["AWS_REGION"]
@@ -68,8 +68,6 @@ def sigv4_request(
         headers=req.headers,
         data=req.body
     )
-    
-    
 
 def askQuestion(question, url, endSession=False):
     myobj = {
@@ -92,8 +90,6 @@ def askQuestion(question, url, endSession=False):
     )
     
     return decode_response(response)
-
-
 
 
 def decode_response(response):

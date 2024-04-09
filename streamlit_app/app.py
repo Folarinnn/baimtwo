@@ -3,6 +3,8 @@ import streamlit as st
 import json
 import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
+import re
+
 
 # Streamlit page configuration
 st.set_page_config(page_title="Call Multiple Models Agent", page_icon=":robot_face:", layout="wide")
@@ -38,6 +40,15 @@ st.sidebar.title("Trace Data")
 # Session State Management
 if 'history' not in st.session_state:
     st.session_state['history'] = []
+
+
+def format_link(text):
+    # Regular expression to find URLs
+    url_pattern = r'(https?://\S+)'
+    # Replace URLs in the text with Markdown links using "link" as the display text
+    formatted_text = re.sub(url_pattern, r'[Generated Image Link](\1)', text)
+    return formatted_text
+
 
 # Function to parse and format response
 def format_response(response_body):
@@ -110,14 +121,18 @@ robot_image = Image.open('images/robot_face.jpg')
 circular_human_image = crop_to_circle(human_image)
 circular_robot_image = crop_to_circle(robot_image)
 
+# Before displaying conversation history
+
 for index, chat in enumerate(reversed(st.session_state['history'])):
+    formatted_question = format_link(chat["question"])
+    formatted_answer = format_link(chat["answer"])
+    
     # Creating columns for Question
     col1_q, col2_q = st.columns([2, 10])
     with col1_q:
         st.image(circular_human_image, width=125)
     with col2_q:
-        # Generate a unique key for each question text area
-        st.text_area("Q:", value=chat["question"], height=50, key=f"question_{index}", disabled=True)
+        st.text_area("Q:", value=formatted_question, height=50, key=f"question_{index}", disabled=True)
 
     # Creating columns for Answer
     col1_a, col2_a = st.columns([2, 10])
@@ -125,14 +140,15 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
         with col1_a:
             st.image(circular_robot_image, width=100)
         with col2_a:
-            # Generate a unique key for each answer dataframe
             st.dataframe(chat["answer"], key=f"answer_df_{index}")
     else:
         with col1_a:
             st.image(circular_robot_image, width=150)
         with col2_a:
-            # Generate a unique key for each answer text area
-            st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}")
+            # Directly use st.markdown to render the answer with clickable links
+            st.markdown(formatted_answer, unsafe_allow_html=True)
+
+
 
 # Example Prompts Section
 st.write("## Model Prompts")
@@ -180,7 +196,7 @@ meta_prompts = [
 
 # Amazon Prompts
 amazon_prompts = [
-    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me an image of a lion with a crown on its head in the middle of california.",
+    {"Prompt": "Use model amazon.titan-image-generator-v1 and create me an image of a woman in a boat on a river.",
      "Usecase": "Text-to-image"},
     {"Prompt": "Use model amazon.titan-text-express-v1. Meeting transcript is the following - Miguel: Hi Brant, I want to discuss the workstream for our new product launch Brant: Sure Miguel, is there anything in particular you want to discuss? Miguel: Yes, I want to talk about how users enter into the product. Brant: Ok, in that case let me add in Namita. Namita: Hey everyone Brant: Hi Namita, Miguel wants to discuss how users enter into the product. Miguel: its too complicated and we should remove friction. for example, why do I need to fill out additional forms? I also find it difficult to find where to access the product when I first land on the landing page. Brant: I would also add that I think there are too many steps. Namita: Ok, I can work on the landing page to make the product more discoverable but brant can you work on the additional forms? Brant: Yes but I would need to work with James from another team as he needs to unblock the sign up workflow. Miguel can you document any other concerns so that I can discuss with James only once? Miguel: Sure. - From the meeting transcript above, Create a list of action items for each person.",
      "Usecase": "Summarization"},
@@ -190,7 +206,7 @@ amazon_prompts = [
 
 # Stability AI Prompts
 stability_ai_prompts = [
-    {"Prompt": "Use model stability.stable-diffusion-xl-v0. Create an image of a cowboy riding a dinosaur on the moon.",
+    {"Prompt": "Use model stability.stable-diffusion-xl-v0. Create an image of an astronaut riding a horse in the desert.",
      "Usecase": "Text-to-image"},
     {"Prompt": "Use model stability.stable-diffusion-xl-v1 to generate what a group of people would look like upset in the middle of an arena.",
      "Usecase": "Text-to-image"},

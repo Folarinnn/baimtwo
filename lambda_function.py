@@ -4,15 +4,16 @@ import base64
 import logging
 import boto3
 import io
-import time
 from PIL import Image
 from botocore.exceptions import ClientError
 from langchain.llms.bedrock import Bedrock
 #from langchain_community.chat_models import BedrockChat
 
+
+bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
+
 s3 = boto3.client('s3')
 logger = logging.getLogger(__name__)
-bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
 object_name = 'generated_pic.png' 
 
 def lambda_handler(event, context):
@@ -121,7 +122,6 @@ def lambda_handler(event, context):
                 f"Finished generating image with Amazon Titan Image Generator G1 model {model_id}.")
 
 
-        
     class Claude3Wrapper:
         """Encapsulates Claude 3 model invocations using the Amazon Bedrock Runtime client."""
         def __init__(self, client=None):
@@ -354,40 +354,65 @@ def lambda_handler(event, context):
         elif model_id.startswith('stability'):
             def save_image_to_s3(image_bytes_io, bucket, object_name):
                 """
-                Saves an image (provided as a BytesIO object) to an S3 bucket for 'stability' models.
+                Saves an image (provided as a BytesIO object) to an S3 bucket for 'stability' models
+                and returns a presigned URL for the object.
                 """
-                image = Image.open(image_bytes_io)
-                output_image_bytes = io.BytesIO()
-                image.save(output_image_bytes, format='PNG')
-                output_image_bytes.seek(0)
-                s3.put_object(Bucket=bucket, Key=object_name, Body=output_image_bytes.getvalue())
-                print(f"Image successfully saved to s3://{bucket}/{object_name}")
+                try:
+                    image = Image.open(image_bytes_io)
+                    output_image_bytes = io.BytesIO()
+                    image.save(output_image_bytes, format='PNG')
+                    output_image_bytes.seek(0)
+                    s3.put_object(Bucket=bucket, Key=object_name, Body=output_image_bytes.getvalue())
+                    print(f"Image successfully saved to s3://{bucket}/{object_name}")
+                    
+                    # Generate a presigned URL for the saved image
+                    presigned_url = s3.generate_presigned_url('get_object',
+                                                            Params={'Bucket': bucket, 'Key': object_name},
+                                                            ExpiresIn=3600)  # URL expires in 1 hour
+                    return presigned_url
+                except ClientError as e:
+                    print(e)
+                    return None
 
             image_response = get_image_response(client, prompt)
             #generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))
             generated_object_name = object_name       
-            save_image_to_s3(image_response, bucket_name, generated_object_name)
-            return "Stability image created and saved successfully"
+            presigned_url = save_image_to_s3(image_response, bucket_name, generated_object_name)
+            if presigned_url:
+                return {"message": "Stability image created and saved successfully", "url": presigned_url}
+            else:
+                return {"message": "Failed to create or save the image."}
 
         # Conditional check for model_id equal to 'amazon.titan-image-generator-v1'
         elif model_id == 'amazon.titan-image-generator-v1':
             def save_image_to_s3(image, bucket, object_name):
                 """
-                Saves an image (provided as a PIL Image object) to an S3 bucket for 'amazon.titan-image-generator-v1' models.
+                Saves an image (provided as a PIL Image object) to an S3 bucket for 'amazon.titan-image-generator-v1' models
+                and returns a presigned URL for the object.
                 """
-                image_bytes = io.BytesIO()
-                image.save(image_bytes, format='PNG')
-                image_bytes.seek(0)
-                s3.put_object(Bucket=bucket, Key=object_name, Body=image_bytes)
-                print(f"Image successfully saved to s3://{bucket}/{object_name}")
+                try:
+                    image_bytes = io.BytesIO()
+                    image.save(image_bytes, format='PNG')
+                    image_bytes.seek(0)
+                    s3.put_object(Bucket=bucket, Key=object_name, Body=image_bytes.getvalue())
+                    print(f"Image successfully saved to s3://{bucket}/{object_name}")
+                    
+                    # Generate a presigned URL for the saved image
+                    presigned_url = s3.generate_presigned_url('get_object',
+                                                            Params={'Bucket': bucket, 'Key': object_name},
+                                                            ExpiresIn=3600)  # URL expires in 1 hour
+                    return presigned_url
+                except Exception as e:
+                    print(e)
+                    return None
 
-            # Your existing code to get and process the image
-            image_response = get_image_response(client, prompt)  # Assuming this returns a PIL Image object
-            #generated_object_name = 'generated_images/image_{}.png'.format(int(time.time()))  
-            generated_object_name = object_name 
-            save_image_to_s3(image_response, bucket_name, generated_object_name)
-            return "Amazon image created and saved successfully"
-
+            image_response = get_image_response(client, prompt)
+            generated_object_name = object_name
+            presigned_url = save_image_to_s3(image_response, bucket_name, generated_object_name)
+            if presigned_url:
+                return {"message": "Amazon image created and saved successfully", "url": presigned_url}
+            else:
+                return {"message": "Failed to create or save the image."}
 
         else:
             model_kwargs = get_inference_parameters(model_id)
