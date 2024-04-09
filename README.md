@@ -7,8 +7,10 @@ This project is intended to be a baseline for developers to extend there use cas
 - Multiple model result comparison
 - Text generation 
 - Summarization
+- Text-to-sql
 - Text-to-image
 - Image-to-text
+- Image scoring
 - Problem solving
 - Q&A
 - RAG (optional)
@@ -60,12 +62,21 @@ This project is intended to be a baseline for developers to extend there use cas
 
 ## Configuration and Setup
 
-### Step 1: Download project. Setup & run Docker
+### Step 1: Setup ECR:
+
+- The first thing we will do is setup a container registry in [ECR (Elastic Container registry)](https://aws.amazon.com/ecr/). This will be used to store our Docker container image for our Lambda function. 
+
+-Log into the management console, and search ECR in the search bar at the top. Select the service, then `Create repository`.
+
+![ecr btn](images/ecr_create_btn.png)
+
+
+### Step 2: Download project. Setup & run Docker
 - We will need to run Docker in order to create a docker container image that will be used for our Lambda function. This function will be used with the action group of the agent in order to infer models. 
 
 - Download the project from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/archive/refs/heads/main.zip). Once downloaded, please open up the project in your IDE of choice. For this project, I will be using [Visual Studio code](https://code.visualstudio.com/docs/sourcecontrol/intro-to-git)
 
-- Open a terminal at the root directory of the project `bedrock-agent-call-multiple-models`
+- Navigate to the root directory of the project `bedrock-agent-call-multiple-models` in your IDE. Open a terminal here is well. 
 
 
 

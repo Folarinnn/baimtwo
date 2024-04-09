@@ -181,15 +181,30 @@ anthropic_prompts2 = [
 
 # Mistral Prompts
 mistral_prompts = [
-    {"Prompt": "Use model mistral.mistral-large-2402-v1:0. Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it: [INST]'{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}'[/INST]",
-     "Usecase": "Problem solving"},
+    {
+    "Prompt": "Use model 'mistral.mixtral-8x7b-instruct-v0:1' to create a SQL query that fetches all procedures in the consultation category that are insured, including all details. Here are the Amazon Athena database schemas and examples of queries for reference.",
+    "Usecase": "Text-to-SQL",
+    "Prompt Engineer": {
+        "Prompt Engineer": {
+        "Customers & Procedures table": "CUSTOMERS TABLE: CREATE EXTERNAL TABLE athena_db.customers (`Cust_Id` integer, `Customer` string, `Balance` integer, `Past_Due` integer, `Vip` string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n' STORED AS TEXTFILE LOCATION 's3://athena-datasource-alias/'; PROCEDURES TABLE: CREATE EXTERNAL TABLE athena_db.procedures (`Procedure_ID` string, `Procedure` string, `Category` string, `Price` integer, `Duration` integer, `Insurance` string, `Customer_Id` integer) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n' STORED AS TEXTFILE LOCATION 's3://athena-datasource-alias/'; ExampleQueries: SELECT * FROM athena_db.procedures WHERE insurance = 'yes'; SELECT * FROM athena_db.customers WHERE balance >= 0;",
+        }
+    }
+    },
+    {
+    "Prompt": "Use model mistral.mistral-large-2402-v1:0. Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it.",
+    "Usecase": "Problem solving",
+    "Prompt Engineer": {
+        "Data": "{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}"
+    }
+    },
     {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me in Bash, how do I list all text files in the current directory (excluding subdirectories) that have been modified in the last month?",
      "Usecase": "Code generation"},
     {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me what is the difference between inorder and preorder traversal? Give an example in Python.",
      "Usecase": "Q&A and Code Generation"},
-    {"Prompt": "Use model mistral.mixtral-8x7b-instruct-v0:1. What is your favourite condiment? Well, I'm quite partial to a good squeeze of fresh lemon juice. It adds just the right amount of zesty flavour to whatever I'm cooking up in the kitchen! Do you have mayonnaise recipes?",
-     "Usecase": "Q & A - Create recipe"}
 ]
+
+
+
 
 # Meta Prompts
 meta_prompts = [
