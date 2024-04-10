@@ -9,6 +9,7 @@ from requests import request
 import base64
 import io
 import sys
+from PIL import Image
 
 #For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use. 
 #You also need to input your model ID near the bottom of this file.
@@ -21,6 +22,8 @@ import sys
 
 agentId = "EKVDUAOMF6" #INPUT YOUR AGENT ID HERE
 agentAliasId = "PXWPTNQRAM" # Hits draft alias, set to a specific alias id for a deployed version
+bucket_name = 'bedrock-agent-images'
+image_name = 'the_image.png'
 os.environ["AWS_REGION"] = "us-west-2"
 
 theRegion = os.environ["AWS_REGION"]
@@ -100,6 +103,47 @@ def delete_file_from_s3(bucket_name, object_name):
     except Exception as e:
         print(f"Error deleting file {object_name} from bucket {bucket_name}: {str(e)}")
 
+
+# Function to upload image to S3
+def upload_image_to_s3(uploaded_file):
+    """
+    Converts uploaded image to PNG format and uploads to an S3 bucket.
+    
+    Parameters:
+    - uploaded_file: The uploaded file object from Streamlit.
+    - bucket_name: The name of the S3 bucket.
+    
+    Returns:
+    A success message if upload succeeds, otherwise an error message.
+    """
+    # Initialize S3 client
+    s3_client = boto3.client('s3')
+    
+    # Supported image types
+    supported_types = ['jpg', 'jpeg', 'png']
+    file_type = uploaded_file.type.split('/')[-1]
+
+    if file_type.lower() not in supported_types:
+        return "File must be jpg, jpeg, or png."
+
+    try:
+        # Convert uploaded file to PIL Image
+        image = Image.open(uploaded_file)
+        
+        # Convert image to PNG byte array
+        img_byte_arr = io.BytesIO()
+        image.save(img_byte_arr, format='PNG')
+        img_byte_arr = img_byte_arr.getvalue()
+
+        # Upload the PNG byte array to S3
+        s3_client.put_object(Body=img_byte_arr, Bucket=bucket_name, Key=image_name)
+
+        return "Image successfully uploaded to S3 as 'image.png'."
+    except Exception as e:
+        # Handle exceptions
+        print(e)
+        return "Failed to upload the image to S3."
+    
 
 def decode_response(response):
     # Create a StringIO object to capture print statements

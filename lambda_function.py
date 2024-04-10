@@ -13,8 +13,9 @@ from langchain.llms.bedrock import Bedrock
 bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
 
 s3 = boto3.client('s3')
+object_name = 'the_image.png' 
 logger = logging.getLogger(__name__)
-object_name = 'generated_pic.png' 
+
 
 def lambda_handler(event, context):
     print(event)

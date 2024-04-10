@@ -5,6 +5,7 @@ import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
 import re
 
+live_session_id = "MYSESSION7"
 
 # Streamlit page configuration
 st.set_page_config(page_title="Call Multiple Models Agent", page_icon=":robot_face:", layout="wide")
@@ -19,7 +20,7 @@ def crop_to_circle(image):
     return result
 
 # Title
-st.title("Call Multiple Models Agent")
+st.title("Multiple Models Agent")
 
 # Display a text box for request & engineering prompmt
 engineering_prompt = st.text_input("Advanced prompt (Optional): ", max_chars=2000)
@@ -31,8 +32,23 @@ request_prompt = request_prompt.strip()
 # Display a primary button for submission
 submit_button = st.button("Submit", type="primary")
 
-# Display a button to end the session
-end_session_button = st.button("End Session")
+# Create a file uploader widget
+uploaded_file = st.file_uploader("", type=['jpg', 'jpeg', 'png'])
+
+# Check if a file has been uploaded
+if uploaded_file is not None:
+    result_message = agenthelper.upload_image_to_s3(uploaded_file)
+    st.write(result_message)
+
+    # Display the uploaded image
+    st.image(uploaded_file, caption='Uploaded Image.', width=300)
+    st.write("Image Uploaded Successfully!")
+else:
+    st.write("Please upload an image file.")
+
+
+
+
 
 # Sidebar for user input
 st.sidebar.title("Trace Data")
@@ -70,7 +86,7 @@ if submit_button and request_prompt:
     combined_prompt = f"{request_prompt} - {engineering_prompt}" if engineering_prompt else request_prompt
     
     event = {
-        "sessionId": "MYSESSION2",
+        "sessionId": live_session_id,
         "question": combined_prompt
     }
     
@@ -100,17 +116,9 @@ if submit_button and request_prompt:
     st.session_state['history'].append({"question": combined_prompt, "answer": the_response})
     st.session_state['trace_data'] = the_response
 
+
 submit_button2 = st.button("Delete Image", type="primary")
 
-if end_session_button:
-    st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
-    event = {
-        "sessionId": "MYSESSION2",
-        "question": "placeholder to end session",
-        "endSession": True
-    }
-    agenthelper.lambda_handler(event, None)
-    st.session_state['history'].clear()
 
 # Display conversation history
 st.write("## Conversation History")
@@ -182,7 +190,7 @@ anthropic_prompts2 = [
 # Mistral Prompts
 mistral_prompts = [
     {
-    "Prompt": "Use model 'mistral.mixtral-8x7b-instruct-v0:1' to create a SQL query that fetches all procedures in the consultation category that are insured, including all details. Here are the Amazon Athena database schemas and examples of queries for reference.",
+    "Prompt": "Use model 'mistral.mixtral-8x7b-instruct-v0:1' to create a SQL query that only fetches procedures in the dental category that are insured. Here are the Amazon Athena database schemas and examples of queries for reference.",
     "Usecase": "Text-to-SQL",
     "Prompt Engineer": {
         "Prompt Engineer": {
@@ -191,11 +199,10 @@ mistral_prompts = [
     }
     },
     {
-    "Prompt": "Use model mistral.mistral-large-2402-v1:0. Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it.",
-    "Usecase": "Problem solving",
-    "Prompt Engineer": {
-        "Data": "{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}"
-    }
+        "Prompt": "Use model mistral.mistral-large-2402-v1:0. Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it.",
+        "Usecase": "Problem solving",
+        "Prompt Engineer": "{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}"
+        
     },
     {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me in Bash, how do I list all text files in the current directory (excluding subdirectories) that have been modified in the last month?",
      "Usecase": "Code generation"},
@@ -290,3 +297,16 @@ st.table(image_generate_and_rate_prompt)
 st.write("### RAG")
 st.table(knowledge_base_model_promt)
 
+
+# Display a button to end the session
+end_session_button = st.button("End Session")
+
+if end_session_button:
+    st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
+    event = {
+        "sessionId": live_session_id,
+        "question": "placeholder to end session",
+        "endSession": True
+    }
+    agenthelper.lambda_handler(event, None)
+    st.session_state['history'].clear()
