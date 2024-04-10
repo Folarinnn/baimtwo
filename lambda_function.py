@@ -525,7 +525,7 @@ def lambda_handler(event, context):
                     # Generate a presigned URL for the saved image
                     presigned_url = s3.generate_presigned_url('get_object',
                                                             Params={'Bucket': bucket, 'Key': object_name},
-                                                            ExpiresIn=3600)  # URL expires in 1 hour
+                                                            ExpiresIn=604800)  # URL expires in 7 days
                     return presigned_url
                 except Exception as e:
                     print(e)

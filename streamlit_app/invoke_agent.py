@@ -20,7 +20,7 @@ import sys
 
 
 agentId = "EKVDUAOMF6" #INPUT YOUR AGENT ID HERE
-agentAliasId = "1FEGLLFB3L" # Hits draft alias, set to a specific alias id for a deployed version
+agentAliasId = "PXWPTNQRAM" # Hits draft alias, set to a specific alias id for a deployed version
 os.environ["AWS_REGION"] = "us-west-2"
 
 theRegion = os.environ["AWS_REGION"]

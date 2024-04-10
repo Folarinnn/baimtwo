@@ -66,9 +66,14 @@ This project is intended to be a baseline for developers to extend there use cas
 
 - The first thing we will do is setup a container registry in [ECR (Elastic Container registry)](https://aws.amazon.com/ecr/). This will be used to store our Docker container image for our Lambda function. 
 
--Log into the management console, and search ECR in the search bar at the top. Select the service, then `Create repository`.
+- Log into the management console, and search ECR in the search bar at the top. Select the service, then `Create repository`.
 
 ![ecr btn](streamlit_app/images/ecr_create_btn.png)
+
+- Provide a repo name. Lets call it `bedrock-agent-bedrock-agent-model-calls`. Leave the other options as default. Scroll to the bottom, then create the repository. 
+
+![ecr btcreaten](streamlit_app/images/ecr_create.png)
+
 
 
 ### Step 2: Download project. Setup & run Docker

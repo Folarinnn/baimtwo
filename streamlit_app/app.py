@@ -22,7 +22,7 @@ def crop_to_circle(image):
 st.title("Call Multiple Models Agent")
 
 # Display a text box for request & engineering prompmt
-engineering_prompt = st.text_input("Engineering prompt (Optional): ", max_chars=2000)
+engineering_prompt = st.text_input("Advanced prompt (Optional): ", max_chars=2000)
 engineering_prompt = engineering_prompt.strip()
 
 request_prompt = st.text_input("Please enter the request prompt: ", max_chars=10000)
@@ -247,12 +247,12 @@ ai21labs_prompts = [
 ]
 
 knowledge_base_model_promt = [
-    {"Prompt": "Provide me a description about inflation and rising prices from the FOMC reports. Then use model amazon.titan-image-generator-v1 to generate what a group of people would look like based on this description.",
+    {"Prompt": "Provide me a description about inflation and rising prices from the FOMC reports.",
      "Usecase": "RAG"}
 ]
 
 image_generate_and_rate_prompt = [
-    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me a pie chart that shows a 70 percent sales growth. Use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded. Dont ask about the image, because the model function will have the information needed to provide a response. Then use the same model to give me a confidence score and explain your reasoning",
+    {"Prompt": "Use model amazon.titan-image-generator-v1. Create me a pie chart that shows a 70 percent sales growth. Use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded. Then use the same model to give me a confidence score and explain your reasoning. Dont ask about the image, because the model function will have the information needed to provide a response.",
      "Usecase": "Image generation & rating"}
 ]
 
@@ -287,6 +287,6 @@ st.table(ai21labs_prompts)
 st.write("### Amazon & Claude Model")
 st.table(image_generate_and_rate_prompt)
 
-st.write("### RAG & Amazon Model")
+st.write("### RAG")
 st.table(knowledge_base_model_promt)
 
