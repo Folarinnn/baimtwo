@@ -116,20 +116,20 @@ This project is intended to be sample code used as a baseline for builders to ex
 - More documentation on setting up ECR & installing Docker can be found [here](https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html).
 
 
-### Step 4: Lambda Function Creation
+### Step 4: Lambda function creation
 - Now we create a Lambda function (Python 3.12) for the Bedrock agent's action group using the container image from earlier. 
 
 - Select `Create function`. Then select the `Container image` radio button from the top 3 options.
 - We will call this Lambda function `bedrock-agent-model-call`. For `Container image URI`, browse the images, select repo `bedrock-agent-bedrock-agent-model-calls`, then the latest image. 
 - Leave the other options as default, then select `Create function`.
 
-- Once the Lambda function is created, we need to provide the bedrock agent permissions to invoke it. Scroll down and select the `Configuration` tab. On the left, select `Permissions`. Scroll down to *Resource-based policy statements** and select `Add permissions`.
+- Once the Lambda function is created, we need to provide the bedrock agent permissions to invoke it. Scroll down and select the `Configuration` tab. On the left, select `Permissions`. Scroll down to **Resource-based policy statements** and select `Add permissions`.
 
 - Select `AWS service` in the middle for your policy statement. Choose `Other` for your service, and put `allow-agent` for the StatementID. For the Principal, put ```input bedrock.amazonaws.com ```.
-- Enter ```arn arn:aws:bedrock:us-west-2:`{aws-account-id}`:agent/* ```. Please note, we normally recommened least privilage so that only the allowed agent can invoke this Lambda function. Lastly, for the Action, select `lambda:InvokeAction`, then **Save**.
+- Enter ```arn arn:aws:bedrock:us-west-2:`{aws-account-id}`:agent/* ```. Please note, AWS generally recommeneds least privilage so that only the allowed agent can invoke this Lambda function. Lastly, for the Action, select `lambda:InvokeAction`, then **Save**.
 
 
-### Step 5: Setup Bedrock Agent and Action Group 
+### Step 5: Setup Bedrock agent and action group 
 - Navigate to the Bedrock console. Go to the toggle on the left, and under **Orchestration** select `Agents`. Provide an agent name, like **multi-model-agent** then create the agent.
 
 - On the next screen, provide an agent name, like **multi-model-agent**. Leave the other options as default, then create the agent.
@@ -274,7 +274,7 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 
 
 
-## Step 7: Setting Up and Running the Streamlit App
+## Step 7: Setting up and running the Streamlit app
 -  **Obtain the Streamlit App ZIP File**: Download the zip file of the project [here](https://github.com/build-on-aws/bedrock-agents-streamlit/archive/refs/heads/main.zip).
 
 
