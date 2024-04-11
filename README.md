@@ -98,7 +98,7 @@ This project is intended to be sample code used as a baseline for builders to ex
 
 - Navigate to the root directory of the project `bedrock-agent-call-multiple-models` in your IDE. Open a terminal here is well. 
 
-- The commands below can be used to login your ECR, then build, tag, and push your Docker container image to ECR.
+- The commands below can be used to login your ECR, then build, tag, and push your Docker container image to ECR. **Make sure to update the account-number and region in these commands**.
 
    ```bash 
    aws ecr get-login-password --region {Region} | docker login --username AWS --password-stdin {account-number}.dkr.ecr.{Region}.amazonaws.com 
