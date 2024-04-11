@@ -1,7 +1,7 @@
 # Setup Amazon Bedrock agent to call various models.
 
 ## Introduction
-This project is intended to be a baseline for developers to extend there use cases with Amazon Bedrock agents across most available models in Bedrock. This README will guide you through setting this up step by step to empower you to further explore the capabilities of Bedrock agents. 
+This project is intended to be sample code used as a baseline for developers to extend there use cases with Amazon Bedrock agents across various models in Amazon Bedrock. This README will guide you through setting this up step by step to empower you to further explore the capabilities of Bedrock agents. 
 
 ## Use cases for this project
 - Multiple model result comparison
@@ -10,15 +10,16 @@ This project is intended to be a baseline for developers to extend there use cas
 - Text-to-sql
 - Text-to-image
 - Image-to-text
-- Image scoring
+- Image rating
 - Problem solving
 - Q&A
 - RAG (optional)
+- Other
 
 
 ## Prerequisites
 - An active AWS Account.
-- Familiarity with AWS services like Amazon Bedrock, S3, Lambda, Athena and Cloud9 , and Docker.
+- Familiarity with AWS services like Amazon Bedrock, S3, Lambda, and Cloud9 , and Docker.
 - All models that you plan to test will need to be granted access via Amazon Bedrock 
 
 ## Models this project currently supports:
@@ -65,10 +66,9 @@ This project is intended to be a baseline for developers to extend there use cas
 
 
 ### Step 1: Creating an S3 Bucket
-- This step will be required in order to do image-to-text and text-to-image inference calls to certain models.
-- Please make sure that you are in the **us-west-2** region. If another region is required, you will need to update the region in the `invoke_agent.py` file on line 26 of the sample. 
+- This step will be required in order to do image-to-text and text-to-image inference calls to certain models. Also, make sure that you are in the **us-west-2** region. If another region is required, you will need to update the region in the `invoke_agent.py` file on line 26 of the sample. 
 - Create an S3 bucket, and call it `bedrock-agent-images-alias`. We will use the default settings.
-- Next, upload the image from [here](https://), to this S3 bucket.
+- Next, upload the sample image from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/blob/main/images/generated_pic.png), to this S3 bucket.
 
 
 ### Step 2: Create an Amazon ECR (Elastic Container Registry)
@@ -215,8 +215,25 @@ You are an research agent that interacts with various models to do tasks and ret
 
 ### Step 6: Test various models
 
-- You should see an option for you  to test the agent on the right. Below are a few prompts thtat you can test. However you can become creative if you all and test variations. One thing to note.
-`(When you do text-to-image or image-to-text, they reference the same .png file statically in the sample code. In an ideal environment, this step would be configured more dynamically.)` 
+- On the right, you should see an option  to test the agent with a user input field. Below are a few prompts that you can test. However, you can become creative if you all and test variations. 
+- One thing to note before testing. When you do text-to-image or image-to-text, the sample code references the same .png file statically. In an ideal environment, this step can be configured to be more dynamically.
+
+
+``` prompt
+Use model amazon.titan-image-generator-v1 and create me an image of a woman in a boat on a river.
+```
+
+```prompt
+Use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. The model function will have the information needed to provide a response. So, dont ask about the image.
+```
+
+``` prompt
+Use model amazon.titan-image-generator-v1 and create me an image of a woman in a boat on a river.
+```
+
+``` prompt
+Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in writing Google ads. You are tasked to write a persuasive and personalized Google ad based on a company name and a short description. You need to write the Headline and the content of the Ad itself. For example: Company: Upwork Description: Freelancer marketplace Headline: Upwork: Hire The Best - Trust Your Job To True Experts Ad: Connect your business to Expert professionals & agencies with specialized talent. Post a job today to access Upwork's talent pool of quality professionals & agencies. Grow your team fast. 90% of customers rehire. Trusted by 5M+ businesses. Secure payments. - Write a persuasive and personalized Google ad for the following company. Company: Click Description: SEO services
+```
 
 
 
