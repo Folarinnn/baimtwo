@@ -5,7 +5,7 @@ import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
 import re
 
-live_session_id = "MYSESSION17"
+live_session_id = "MYSESSION"
 image_name = 'the_image.png'
 
 
