@@ -100,10 +100,18 @@ This project is intended to be sample code used as a baseline for builders to ex
 
 - The commands below can be used to login your ECR, then build, tag, and push your Docker container image to ECR.
 
-   ```bash aws ecr get-login-password --region {Region} | docker login --username AWS --password-stdin {account-number}.dkr.ecr.{Region}.amazonaws.com ```
-   ```bash docker build -t python3.11:local -f Dockerfile.python3.11 . ```
-   ```bash docker tag python3.11:local {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-model-calls:latest ```
-   ```bash docker push {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest ```
+   ```bash 
+   aws ecr get-login-password --region {Region} | docker login --username AWS --password-stdin {account-number}.dkr.ecr.{Region}.amazonaws.com 
+   ```
+   ```bash 
+   docker build -t python3.11:local -f Dockerfile.python3.11 . 
+   ```
+   ```bash 
+   docker tag python3.11:local {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-model-calls:latest 
+   ```
+   ```bash 
+   docker push {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest 
+   ```
 
 - More documentation on setting up ECR & installing Docker can be found [here](https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html).
 
