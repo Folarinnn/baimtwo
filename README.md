@@ -1,7 +1,13 @@
 # Setup Amazon Bedrock agent to call various models.
 
 ## Introduction
-This project is intended to be sample code used as a baseline for developers to extend there use cases with Amazon Bedrock agents across various models in Amazon Bedrock. This README will guide you through setting this up step by step to empower you to further explore the capabilities of Bedrock agents. 
+This project is intended to be sample code used as a baseline for builders to extend there use cases across various LLMs via Amazon Bedrock agents. The intent is to show the art of the possible leveraging all available models on Bedrock for chained responses to fit different use cases. This README is a guide to setting this up, giving you the ability to further explore the power of agents with the latest models on Amazon bedrock. 
+
+## Prerequisites
+- An active AWS Account.
+- Familiarity with AWS services like Amazon Bedrock, S3, Lambda, and Cloud9 , and Docker.
+- All models that you plan to test will need to be granted access via Amazon Bedrock 
+
 
 ## Use cases for this project
 - Multiple model result comparison
@@ -17,10 +23,7 @@ This project is intended to be sample code used as a baseline for developers to 
 - Other
 
 
-## Prerequisites
-- An active AWS Account.
-- Familiarity with AWS services like Amazon Bedrock, S3, Lambda, and Cloud9 , and Docker.
-- All models that you plan to test will need to be granted access via Amazon Bedrock 
+
 
 ## Models this project currently supports:
 
@@ -75,7 +78,7 @@ This project is intended to be sample code used as a baseline for developers to 
 
 - We will need to create a container registry in [ECR (Elastic Container registry)](https://aws.amazon.com/ecr/). This will be used to store our Docker container image for our Lambda function. 
 
-- Log into the management console, and search ECR in the search bar at the top. Select the service, then `Create repository`.
+- Log into the management console, and search ECR in the search bar at the top. Select the service, then **Create repository**.
 
 ![ecr btn](streamlit_app/images/ecr_create_btn.png)
 
@@ -86,9 +89,12 @@ This project is intended to be sample code used as a baseline for developers to 
 
 
 ### Step 3: Download project. Setup & run Docker
-- We will need to run Docker in order to create a docker container image that will be used for our Lambda function. This function will be used with the action group of the agent in order to infer your model of choice. 
 
-- Download the project from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/archive/refs/heads/main.zip). Once downloaded, please open up the project in your IDE of choice. For this project, I will be using [Visual Studio code](https://code.visualstudio.com/docs/sourcecontrol/intro-to-git)
+- Download the sample project from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/archive/refs/heads/main.zip). 
+
+- Once downloaded, please open up the project in your IDE of choice. For this project, I will be using [Visual Studio code](https://code.visualstudio.com/docs/sourcecontrol/intro-to-git). Please review the code briefly. 
+
+- We will need to run Docker in order to create a docker container image that will be used for our Lambda function. This function will be used with the action group of the agent in order to infer your model of choice. 
 
 - Navigate to the root directory of the project `bedrock-agent-call-multiple-models` in your IDE. Open a terminal here is well. 
 
@@ -213,6 +219,26 @@ You are an research agent that interacts with various models to do tasks and ret
 }
 ```
 
+- Now we will need to modify the `Advanced prompts`. Select the orange **Edit in Agent Builder** button at the top. Scroll down to advanced prompts, then select `Edit`.
+
+- In the `Advanced prompts` box under `Pre-processing template` enable the `Override pre-processing template defaults` option. Also, make sure that `Activate pre-processing template` is disabled. This is so that we will bypass the possibility of deny responses. We are choosing this option for simplicity. Ideally, you would modify these prompts instead to allow what is required. 
+
+- In the `Prompt template editor`, go to line 19 or 20 and Copy & paste the following prompt:
+
+```prompt
+Here is an example of what a url response to access an image should look like:
+<url_example>
+  URL Generated to access the image:
+  
+  https://bedrock-agent-images.s3.amazonaws.com/generated_pic.png?AWSAccessKeyId=123xyz&Signature=rlF0gN%2BuaTHzuEDfELz8GOwJacA%3D&x-amz-security-token=IQoJb3JpZ2luX2VjENH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJIMEYCIQDhxW1co7u3v0O5rt59gRQ6VzD2QEuDHuNExjM5IMnrbAIhANlEfIUbJYOakD40l7T%2F36oxQ6TsHBYJiNMOJVqRKUvhKo8DCPr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQARoMMDcxMDQwMjI3NTk1IgwzlaJstrewYckoQ48q4wLgSb%2BFWzU7DoeopqbophcBtyQVXc4g89lT6durG8qVDKZFPEHHPHAq8br7tmMAywipKvq5rqY8Oo2idUJbAg62FWKVRzT%2FF1UXRmsqKr6cs7spmIIbIkpyi3UXUhyK%2FP%2BhZyUJ%2BCVQTvn2DImBxIRAd7s2h7QzDbN46hyizdQA%2FKlfnURokd3nCZ2svArRjqyr0Zvm%2BCiJVRXjxAKrkNRNFCuaKDVPkC%2F7BWd3AO3WlXPtJZxUriP28uqDNuNsOBU5GMhivUv%2BTzzZdlDlgaSowxZDeWXZyoFs4r4CUW0jMUzdJjOKKTghfOukbguz8voah16ZSI22vbLMruUboBc3TTNRG145hKcGLcuFNywjt2r8fLyxywl8GteCHxuHC667P40U2bOkqSDVzBE4sLQyXJuT%2BaxyLkSsjIEDWV0bdtQeBkptjT3zC8NrcFRx0vyOnWY7aHA0zt1jw%2BfCbdKmijSfMOqo0rAGOp0B098Yen25a84pGd7pBJUkyDa0OWUBgBTuMoDetv%2FfKjstwWuYm1I%2BzSi8vb5HWXG1OO7XLs5QKsP4L6dEnbpq9xBj9%2FPlwv2YcYwJZ6CdNWIr7umFM05%2FB5%2FI3epwN3ZmgJnFxCUngJtt1TZBr%2B7GOftb3LYzU67gd2YMiwlBJ%2BV1k6jksFuIRcQ%2FzsvDvt0QUSyl7xgp8yldZJu5Jg%3D%3D&Expires=1712628409
+</url_example>
+```
+
+- This prompt is needed so that the prsigned url response will be formatted a certain way when images are generated.
+
+- Scroll to the bottom and select the orange button `Save and exit`.
+
+
 ### Step 6: Test various models
 
 - On the right, you should see an option  to test the agent with a user input field. Below are a few prompts that you can test. However, you can become creative if you all and test variations. 
@@ -244,32 +270,21 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 -  **Obtain the Streamlit App ZIP File**: Download the zip file of the project [here](https://github.com/build-on-aws/bedrock-agents-streamlit/archive/refs/heads/main.zip).
 
 
-
--  **Upload to Cloud9**:
-   - In your Cloud9 environment, upload the ZIP file.
-
-![Upload file to Cloud9](Streamlit_App/images/upload_file_cloud9.png)
-
-   - Before going to the next step, make sure that the project finished uploading.
-     
-![Load wait](Streamlit_App/images/load_wait.png)
-
-
 -  **Unzip the File**:
    - Use the following command  to extract the contents:
   
      ```bash
-     unzip bedrock-agents-streamlit-main.zip
+     unzip bedrock-agents-multiple-models
      ```
      
 -  **Navigate to Streamlit_App Folder**:
    - Change to the directory containing the Streamlit app. Use this command
      ``` bash
-     cd ~/environment/bedrock-agents-streamlit-main/Streamlit_App
+     cd ~/environment/bedrock-agents-multiple-models/streamlit_app
      ```
      
 -  **Update Configuration**:
-   - Open the `InvokeAgent.py` file.
+   - Open the `invoke_agent.py` file.
    - Update the `agentId` and `agentAliasId` variables with the appropriate values, then save it.
 
 ![Update Agent ID and alias](Streamlit_App/images/update_agentId_and_alias.png)
@@ -284,12 +299,9 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 -  **Run the Streamlit App**:
    - Execute the command:
      ```bash
-     streamlit run app.py --server.address=0.0.0.0 --server.port=8080
+     streamlit run app.py
      ```
-   - Streamlit will start the app, and you can view it by selecting **Preview** within the Cloud9 IDE at the top, then **Preview Running Application**.
   
-     ![Preview button](Streamlit_App/images/preview_btn.png)
-     
      
    - Once the app is running, please test some of the sample prompts provided. (On 1st try, if you receive an error, try again.)
 
@@ -300,15 +312,5 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 
 ![Trace events ](Streamlit_App/images/trace_events.png)
 
-
-
-## What we're doing here
-
-1. create ECR
-2. containerize application, then push to ECR
-3. Configure Lamda resource policy, CPU & timeout from console
-4. Create S3 & store API schema
-5. Create agent & provide instruction
-6. Create action group in agent using Lambda and api schema(in S3)
 
 
