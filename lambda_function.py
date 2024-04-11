@@ -9,11 +9,10 @@ from botocore.exceptions import ClientError
 from langchain.llms.bedrock import Bedrock
 #from langchain_community.chat_models import BedrockChat
 
-
-bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
-
 s3 = boto3.client('s3')
+bucket_name = 'bedrock-agent-images'  # Replace with the name of your bucket
 object_name = 'the_image.png' 
+
 logger = logging.getLogger(__name__)
 
 
@@ -359,7 +358,7 @@ def lambda_handler(event, context):
                 "top_p": 0.9,
                 "max_gen_len": 512
             }  
-        elif (bedrock_model_provider == 'stability'): #META
+        elif (bedrock_model_provider == 'stability'): 
             #example modelID: stability.stable-diffusion-xl-v0
             return {
                 "weight": 1,

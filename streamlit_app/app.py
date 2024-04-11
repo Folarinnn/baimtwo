@@ -5,7 +5,9 @@ import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
 import re
 
-live_session_id = "MYSESSION7"
+live_session_id = "MYSESSION17"
+image_name = 'the_image.png'
+
 
 # Streamlit page configuration
 st.set_page_config(page_title="Call Multiple Models Agent", page_icon=":robot_face:", layout="wide")
@@ -42,7 +44,6 @@ if uploaded_file is not None:
 
     # Display the uploaded image
     st.image(uploaded_file, caption='Uploaded Image.', width=300)
-    st.write("Image Uploaded Successfully!")
 else:
     st.write("Please upload an image file.")
 
@@ -160,7 +161,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
 # Add a delete button
 if submit_button2:
     # Call the delete function
-    agenthelper.delete_file_from_s3('bedrock-agent-images', 'generated_pic.png')
+    agenthelper.delete_file_from_s3('bedrock-agent-images', image_name)
     st.success('Generated image deleted successfully.')
 
 # Example Prompts Section
@@ -168,40 +169,48 @@ st.write("## Model Prompts")
 
 # Anthropic Prompts
 anthropic_prompts1 = [
-    {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. The model function will have the information needed to provide a response. So, dont ask about the image.", 
+    {"Prompt": "Use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. The model function will have the information needed to provide a response. So, dont ask about the image.", 
      "Usecase": "Image-to-text"},
-    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded, then compare the difference with the previous model description. The model function will have the information needed to provide a response. So, dont ask about the image.", 
+    {"Prompt": "Use model anthropic.claude-3-sonnet-20240229-v1:0 and describe to me the image that is uploaded. Then, provide a rating score based on your image description versus to my last ask of generating an image for me. Explain your reasoning for the answer in detail.", 
      "Usecase": "Image-to-text & comparison"},
-     {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. then from this description, use model stability.stable-diffusion-xl-v1 to create an image.",
-      "Usecase": "Image-to-text to text-to-image"}   
+     {"Prompt": "Use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image that is uploaded. then from this description, use model stability.stable-diffusion-xl-v1 to create an image.",
+      "Usecase": "Image-to-text to text-to-image"},
+     {
+    "Prompt": "Use model anthropic.claude-3-haiku-20240307-v1:0 to create a sql query that only fetches procedures in the dental category that are insured. Refer to the example queries and tables.",
+    "Usecase": "Text-to-sql",
+    "Advanced prompt": {
+    "Customers & Procedures table": "CUSTOMERS TABLE: CREATE EXTERNAL TABLE athena_db.customers (`Cust_Id` integer, `Customer` string, `Balance` integer, `Past_Due` integer, `Vip` string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n' STORED AS TEXTFILE LOCATION 's3://athena-datasource-alias/'; PROCEDURES TABLE: CREATE EXTERNAL TABLE athena_db.procedures (`Procedure_ID` string, `Procedure` string, `Category` string, `Price` integer, `Duration` integer, `Insurance` string, `Customer_Id` integer) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n' STORED AS TEXTFILE LOCATION 's3://athena-datasource-alias/'; ExampleQueries: SELECT * FROM athena_db.procedures WHERE insurance = 'yes'; SELECT * FROM athena_db.customers WHERE balance >= 0;"
+    }
+    },
+      
 ]
 
 anthropic_prompts2 = [
     {"Prompt": "use model anthropic.claude-3-haiku-20240307-v1:0 and tell me some things that most people are happy for, and afraid of.", 
      "Usecase": "Text generation"},
-    {"Prompt": "use model anthropic.claude-3-sonnet-20240229-v1:0 and write a sonnet about a lost kingdom",
+    {"Prompt": "Use model anthropic.claude-3-sonnet-20240229-v1:0 and write a sonnet about a lost kingdom",
      "Usecase": "Text generation"},
-    {"Prompt": "use model anthropic.claude-v2:1 for a summary of the latest climate change research findings",
+    {"Prompt": "Use model anthropic.claude-v2:1 for a summary of the latest climate change research findings",
      "Usecase": "Summarization"},
-    {"Prompt": "use model anthropic.claude-instant-v1 and give an instant response to: What is the essence of happiness?",
+    {"Prompt": "Use model anthropic.claude-instant-v1 and give an instant response to: What is the essence of happiness?",
      "Usecase": "Instant response"}
 ]
 
 # Mistral Prompts
 mistral_prompts = [
     {
-    "Prompt": "Use model 'mistral.mixtral-8x7b-instruct-v0:1' to create a SQL query that only fetches procedures in the dental category that are insured. Here are the Amazon Athena database schemas and examples of queries for reference.",
+    "Prompt": "Use model mistral.mixtral-8x7b-instruct-v0:1 to create a sql query that only fetches customers that have a past due amount over 50, and are vip. Refer to the example queries and tables.",
     "Usecase": "Text-to-SQL",
-    "Prompt Engineer": {
-        "Prompt Engineer": {
+    "Advanced prompt": {
+        "Advanced prompt": {
         "Customers & Procedures table": "CUSTOMERS TABLE: CREATE EXTERNAL TABLE athena_db.customers (`Cust_Id` integer, `Customer` string, `Balance` integer, `Past_Due` integer, `Vip` string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n' STORED AS TEXTFILE LOCATION 's3://athena-datasource-alias/'; PROCEDURES TABLE: CREATE EXTERNAL TABLE athena_db.procedures (`Procedure_ID` string, `Procedure` string, `Category` string, `Price` integer, `Duration` integer, `Insurance` string, `Customer_Id` integer) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n' STORED AS TEXTFILE LOCATION 's3://athena-datasource-alias/'; ExampleQueries: SELECT * FROM athena_db.procedures WHERE insurance = 'yes'; SELECT * FROM athena_db.customers WHERE balance >= 0;",
         }
     }
     },
     {
-        "Prompt": "Use model mistral.mistral-large-2402-v1:0. Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it.",
-        "Usecase": "Problem solving",
-        "Prompt Engineer": "{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}"
+    "Prompt": "Use model mistral.mistral-large-2402-v1:0. Calculate the difference in payment dates between the two customers whose payment amounts are closest to each other in the given dataset, then provide the steps you took to solve it.",
+    "Usecase": "Problem solving",
+    "Advanced prompt": "{\"transaction_id\":{\"0\":\"T1001\",\"1\":\"T1002\",\"2\":\"T1003\",\"3\":\"T1004\",\"4\":\"T1005\"}, \"customer_id\":{\"0\":\"C001\",\"1\":\"C002\",\"2\":\"C003\",\"3\":\"C002\",\"4\":\"C001\"}, \"payment_amount\":{\"0\":125.5,\"1\":89.99,\"2\":120.0,\"3\":54.3,\"4\":210.2}, \"payment_date\":{\"0\":\"2021-10-05\",\"1\":\"2021-10-06\",\"2\":\"2021-10-07\",\"3\":\"2021-10-05\",\"4\":\"2021-10-08\"}, \"payment_status\":{\"0\":\"Paid\",\"1\":\"Unpaid\",\"2\":\"Paid\",\"3\":\"Paid\",\"4\":\"Pending\"}}"
         
     },
     {"Prompt": "Use model mistral.mistral-7b-instruct-v0:2 and tell me in Bash, how do I list all text files in the current directory (excluding subdirectories) that have been modified in the last month?",
@@ -215,7 +224,7 @@ mistral_prompts = [
 
 # Meta Prompts
 meta_prompts = [
-    {"Prompt": "use model meta.llama2-13b-chat-v1 and figure out the following: You are a very intelligent bot with exceptional critical thinking. I went to the market and bought 10 apples. I gave 2 apples to your friend and 2 to the helper. I then went and bought 5 more apples and ate 1. How many apples did I remain with? Provide step by step how you solved it.",
+    {"Prompt": "Use model meta.llama2-13b-chat-v1 and figure out the following: You are a very intelligent bot with exceptional critical thinking. I went to the market and bought 10 apples. I gave 2 apples to your friend and 2 to the helper. I then went and bought 5 more apples and ate 1. How many apples did I remain with? Provide step by step how you solved it.",
      "Usecase": "Math"},
     {"Prompt": "now use model meta.llama2-70b-chat-v1 and figure out the following: You are a very intelligent bot with exceptional critical thinking. I went to the market and bought 10 apples. I gave 2 apples to your friend and 2 to the helper. I then went and bought 5 more apples and ate 1. How many apples did I remain with? Provide step by step how you solved it. Then, compare it with the previous answer.",
      "Usecase": "Math & compare models"}
@@ -227,7 +236,7 @@ amazon_prompts = [
      "Usecase": "Text-to-image"},
     {"Prompt": "Use model amazon.titan-text-express-v1. Meeting transcript is the following - Miguel: Hi Brant, I want to discuss the workstream for our new product launch Brant: Sure Miguel, is there anything in particular you want to discuss? Miguel: Yes, I want to talk about how users enter into the product. Brant: Ok, in that case let me add in Namita. Namita: Hey everyone Brant: Hi Namita, Miguel wants to discuss how users enter into the product. Miguel: its too complicated and we should remove friction. for example, why do I need to fill out additional forms? I also find it difficult to find where to access the product when I first land on the landing page. Brant: I would also add that I think there are too many steps. Namita: Ok, I can work on the landing page to make the product more discoverable but brant can you work on the additional forms? Brant: Yes but I would need to work with James from another team as he needs to unblock the sign up workflow. Miguel can you document any other concerns so that I can discuss with James only once? Miguel: Sure. - From the meeting transcript above, Create a list of action items for each person.",
      "Usecase": "Summarization"},
-    {"Prompt": "Product: Sunglasses. Keywords: polarized, designer, comfortable, UV protection, aviators. Create a table that contains five variations of a detailed product description for the product listed above, each variation of the product description must use all the keywords listed.",
+    {"Prompt": "Use model amazon.titan-text-lite-v1. Product: Sunglasses. Keywords: polarized, designer, comfortable, UV protection, aviators. Create a table that contains five variations of a detailed product description for the product listed above, each variation of the product description must use all the keywords listed.",
      "Usecase": "Open ended text generation"}
 ]
 
@@ -270,14 +279,14 @@ image_generate_and_rate_prompt = [
 st.write("### Amazon Models")
 st.table(amazon_prompts)
 
-st.write("### Stability AI Models")
-st.table(stability_ai_prompts)
-
 st.write("### Anthropic Models")
-st.write("#### The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function IF the mypic.png file is detected in the S3 bucket.")
+st.write("#### The anthropic prompts below are image-to-text inference calls, which will call the image-to-text anthropic function IF the the_image.png file is detected in the S3 bucket.")
 st.table(anthropic_prompts1)
 st.write("#### Remove the mypic.png image from the S3 bucket before running the anthropic prompts below. This will call the text anthropic function if the image is NOT detected in the S3 bucket. If not, the response may have descrepency.")
 st.table(anthropic_prompts2)
+
+st.write("### Stability AI Models")
+st.table(stability_ai_prompts)
 
 st.write("### Mistral Models")
 st.table(mistral_prompts)
@@ -294,8 +303,8 @@ st.table(ai21labs_prompts)
 st.write("### Amazon & Claude Model")
 st.table(image_generate_and_rate_prompt)
 
-st.write("### RAG")
-st.table(knowledge_base_model_promt)
+#st.write("### RAG")
+#st.table(knowledge_base_model_promt)
 
 
 # Display a button to end the session

@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Template for creating a Lambda function and Bedrock agent.
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: The name of the S3 bucket for ApiSchema.
+
+Resources:
+  BedrockAgentMultiModelLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: bedrock-agent-multi-model
+      Handler: lambda_function.handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      CodeUri: !Sub 's3://${S3BucketName}/lambda_function.zip'
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: LambdaExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:*'
+
+  AgentResource:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: multi-models-agent
+      AgentResourceRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/AmazonBedrockExecutionRoleForAgents_user'
+      FoundationModel: anthropic.claude-v2.1
+      Instruction: You are an agent is used to interact with any available model on Amazon Bedrock
+      Description: Description is here
+      IdleSessionTTLInSeconds: 900
+      CustomerEncryptionKeyArn: !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/1234abcd-ab12-34cd-56ef-abcdefg123456'
+      ActionGroups:
+        - ActionGroupName: call-model
+          Description: action group to infer various models
+          ActionGroupExecutor:
+            Lambda: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:bedrock-agent-multi-model'
+          ApiSchema:
+            S3:
+              S3BucketName: !Ref S3BucketName
+              S3ObjectKey: ApiSchema.json

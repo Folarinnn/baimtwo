@@ -21,10 +21,12 @@ from PIL import Image
 
 
 agentId = "EKVDUAOMF6" #INPUT YOUR AGENT ID HERE
-agentAliasId = "PXWPTNQRAM" # Hits draft alias, set to a specific alias id for a deployed version
+agentAliasId = "IBVGOVOW1K" # Hits draft alias, set to a specific alias id for a deployed version
 bucket_name = 'bedrock-agent-images'
-image_name = 'the_image.png'
 os.environ["AWS_REGION"] = "us-west-2"
+
+image_name = 'the_image.png'
+
 
 theRegion = os.environ["AWS_REGION"]
 region = os.environ.get("AWS_REGION")
@@ -104,7 +106,35 @@ def delete_file_from_s3(bucket_name, object_name):
         print(f"Error deleting file {object_name} from bucket {bucket_name}: {str(e)}")
 
 
-# Function to upload image to S3
+
+def resize_image(image):
+    """
+    Resize the image to a width of 300 pixels while maintaining aspect ratio.
+    
+    Parameters:
+    - image: PIL Image object.
+    
+    Returns:
+    A byte array of the resized image.
+    """
+    # Desired width
+    target_width = 300
+
+    # Calculate the new height to maintain aspect ratio
+    original_width, original_height = image.size
+    aspect_ratio = original_height / original_width
+    new_height = int(target_width * aspect_ratio)
+
+    # Resize the image
+    resized_image = image.resize((target_width, new_height), Image.ANTIALIAS)
+
+    # Convert the resized image to a byte array
+    img_byte_arr = io.BytesIO()
+    resized_image.save(img_byte_arr, format='PNG')
+    
+    return img_byte_arr.getvalue()
+
+
 def upload_image_to_s3(uploaded_file):
     """
     Converts uploaded image to PNG format and uploads to an S3 bucket.
@@ -127,13 +157,15 @@ def upload_image_to_s3(uploaded_file):
         return "File must be jpg, jpeg, or png."
 
     try:
-        # Convert uploaded file to PIL Image
+        # Convert uploaded file to PIL Image then resize
         image = Image.open(uploaded_file)
-        
+
         # Convert image to PNG byte array
         img_byte_arr = io.BytesIO()
+
         image.save(img_byte_arr, format='PNG')
         img_byte_arr = img_byte_arr.getvalue()
+        #img_byte_arr = resize_image(img_byte_arr)
 
         # Upload the PNG byte array to S3
         s3_client.put_object(Body=img_byte_arr, Bucket=bucket_name, Key=image_name)
@@ -144,7 +176,7 @@ def upload_image_to_s3(uploaded_file):
         print(e)
         return "Failed to upload the image to S3."
     
-
+    
 def decode_response(response):
     # Create a StringIO object to capture print statements
     captured_output = io.StringIO()
