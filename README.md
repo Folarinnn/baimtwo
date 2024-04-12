@@ -321,3 +321,10 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 
 
 
+## Security
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
+## License
+
+This library is licensed under the MIT-0 License. See the LICENSE file.
