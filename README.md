@@ -1,12 +1,12 @@
 # Setup Amazon Bedrock agent to call various models.
 
 ## Introduction
-This project is intended to be sample code used as a baseline for builders to extend there use cases across various LLMs via Amazon Bedrock agents. The intent is to show the art of the possible leveraging all available models on Bedrock for chained responses to fit different use cases. This README is a guide to setting this up, giving you the ability to further explore the power of agents with the latest models on Amazon bedrock. 
+This project is intended to be a baseline for builders to extend there use cases across various LLMs via Amazon Bedrock agents. The intent is to show the art of the possible leveraging all available models on Bedrock for chained responses to fit different use cases. This README is a guide to setting this up, giving you the ability to further explore the power of agents with the latest models on Amazon bedrock. 
 
 ## Prerequisites
 - An active AWS Account.
 - Familiarity with AWS services like Amazon Bedrock, S3, Lambda, and Cloud9 , and Docker.
-- All models that you plan to test will need to be granted access via Amazon Bedrock 
+- All models that you plan to test will need to be granted access via Amazon Bedrock. 
 
 
 ## Use cases for this project
@@ -69,8 +69,8 @@ This project is intended to be sample code used as a baseline for builders to ex
 
 
 ### Step 1: Creating an S3 Bucket
-- This step will be required in order to do image-to-text and text-to-image inference calls to certain models. Also, make sure that you are in the **us-west-2** region. If another region is required, you will need to update the region in the `invoke_agent.py` file on line 26 of the sample. 
-- Create an S3 bucket, and call it `bedrock-agent-images-alias`. We will use the default settings.
+- This step will be required in order to do image-to-text and text-to-image inference to certain models. Also, make sure that you are in the **us-west-2** region. If another region is required, you will need to update the region in the `invoke_agent.py` file on line 26 of the project code. 
+- Create an S3 bucket, and call it `bedrock-agent-images-{alias}`. Make sure to update `{alias}` with the correct value. THe rest of the settings will remain default.
 - Next, upload the sample image from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/blob/main/images/generated_pic.png), to this S3 bucket.
 
 
@@ -78,7 +78,7 @@ This project is intended to be sample code used as a baseline for builders to ex
 
 - We will need to create a container registry in [ECR (Elastic Container registry)](https://aws.amazon.com/ecr/). This will be used to store our Docker container image for our Lambda function. 
 
-- Log into the management console, and search ECR in the search bar at the top. Select the service, then **Create repository**.
+- Log into the management console, and search `ECR` in the search bar at the top. Select the service, then **Create repository**.
 
 ![ecr btn](streamlit_app/images/ecr_create_btn.png)
 
@@ -92,57 +92,88 @@ This project is intended to be sample code used as a baseline for builders to ex
 
 - Download the sample project from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/archive/refs/heads/main.zip). 
 
-- Once downloaded, please open up the project in your IDE of choice. For this project, I will be using [Visual Studio code](https://code.visualstudio.com/docs/sourcecontrol/intro-to-git). Please review the code briefly. 
+-  Once downloaded, **unzip the file**:
+
+   - Use the following command  to extract the contents:
+  
+    ***macOS/Linux***
+     ```linux
+     unzip bedrock-agents-multiple-models
+     ```
+
+    ***Windows***
+
+    ```windows
+     Expand-Archive -Path bedrock-agents-multiple-models.zip
+     ```
+
+- Open up the project in your IDE of choice. For this project, I will be using [Visual Studio code](https://code.visualstudio.com/docs/sourcecontrol/intro-to-git). Please review the code briefly. 
 
 - We will need to run Docker in order to create a docker container image that will be used for our Lambda function. This function will be used with the action group of the agent in order to infer your model of choice. 
 
 - Navigate to the root directory of the project `bedrock-agent-call-multiple-models` in your IDE. Open a terminal here is well. 
 
-- The commands below can be used to login your ECR, then build, tag, and push your Docker container image to ECR. **Make sure to update the account-number and region in these commands**.
+- The commands below can be used to login your ECR, then build, tag, and push your Docker container image to ECR. **Make sure to update the {account-number} in the commands throughout this project. Region us-west-2 is assumed.**
+
+- For ***macOS/Linux***:
 
    ```bash 
-   aws ecr get-login-password --region {Region} | docker login --username AWS --password-stdin {account-number}.dkr.ecr.{Region}.amazonaws.com 
+   aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin {account-number}.dkr.ecr.us-west-2.amazonaws.com 
    ```
    ```bash 
-   docker build -t python3.11:local -f Dockerfile.python3.11 . 
+   docker build -t app1:local -f Dockerfile.app1 . 
    ```
    ```bash 
-   docker tag python3.11:local {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-model-calls:latest 
+   docker tag app1:local {account-number}.dkr.ecr.us-west-2.amazonaws.com/bedrock-agent-model-calls:latest 
    ```
    ```bash 
-   docker push {account-number}.dkr.ecr.{Region}.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest 
+   docker push {account-number}.dkr.ecr.us-west-2.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest 
    ```
+
+- For ***Windows***:
+
+   ```bash 
+    (Get-ECRLoginCommand).Password | docker login --username AWS --password-stdin {account-number}.dkr.ecr.us-west-2.amazonaws.com
+   ```
+   ```bash 
+   docker build -t app1:local -f Dockerfile.app1 . 
+   ```
+   ```bash 
+   docker tag app1:local {account-number}.dkr.ecr.us-west-2.amazonaws.com/bedrock-agent-model-calls:latest 
+   ```
+   ```bash 
+   docker push {account-number}.dkr.ecr.us-west-2.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest 
+   ```
+
 
 - More documentation on setting up ECR & installing Docker can be found [here](https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html).
 
 
 ### Step 4: Lambda function creation
-- Now we create a Lambda function (Python 3.12) for the Bedrock agent's action group using the container image from earlier. 
+- Now we create a Lambda function (Python 3.12) for the bedrock agent's action group using the container image from the previous step. Navigate back to the AWS management console, then in the search bar, type `Lambda` then selct the service.
 
 - Select `Create function`. Then select the `Container image` radio button from the top 3 options.
 - We will call this Lambda function `bedrock-agent-model-call`. For `Container image URI`, browse the images, select repo `bedrock-agent-bedrock-agent-model-calls`, then the latest image. 
-- Leave the other options as default, then select `Create function`.
+- Leave the other options as default, then select the button **Create function**.
 
 - Once the Lambda function is created, we need to provide the bedrock agent permissions to invoke it. Scroll down and select the `Configuration` tab. On the left, select `Permissions`. Scroll down to **Resource-based policy statements** and select `Add permissions`.
 
-- Select `AWS service` in the middle for your policy statement. Choose `Other` for your service, and put `allow-agent` for the StatementID. For the Principal, put ```input bedrock.amazonaws.com ```.
-- Enter ```arn arn:aws:bedrock:us-west-2:`{aws-account-id}`:agent/* ```. Please note, AWS generally recommeneds least privilage so that only the allowed agent can invoke this Lambda function. Lastly, for the Action, select `lambda:InvokeAction`, then **Save**.
+- Select `AWS service` in the middle for your policy statement. Choose `Other` for your service, and put `allow-agent` for the StatementID. For the Principal, put `bedrock.amazonaws.com `.
+- Enter `arn:aws:bedrock:us-west-2:{aws-account-id}:agent/* `. ***Please note, AWS recommends least privilage so only the allowed agent can invoke this Lambda function***. A `*` at the end of the ARN grants any agent in the account access to invoke this Lambda. Ideally, we would not use this in a production environment. Lastly, for the Action, select `lambda:InvokeAction`, then **Save**.
 
 
 ### Step 5: Setup Bedrock agent and action group 
 - Navigate to the Bedrock console. Go to the toggle on the left, and under **Orchestration** select `Agents`. Provide an agent name, like **multi-model-agent** then create the agent.
 
-- On the next screen, provide an agent name, like **multi-model-agent**. Leave the other options as default, then create the agent.
-
-- The agent description is optional, and we will use the default new service role. For the model, select Anthropic Claude V2.1. Next, provide the following instruction for the agent:
+- The agent description is optional, and we will use the default new service role. For the model, select **Anthropic Claude V2.1**. Next, provide the following instruction for the agent:
 
 ```instruction
 You are an research agent that interacts with various models to do tasks and return information. You use the model ID and prompt from the request, then use your available tools to call models. You use these models for text/code generation, summarization, problem solving, text-to-sql, response comparisons and ratings. You also allow models to do image-to-text. Models can also do text-to-image, while returning a url similar to this example {url_example}. You are only allowed to retrieve information the way I ask. Do not decide when to provide your own response, unless you ask. Return every response in clean format.
 ```
 
-- Next, we will add an action group. Scroll down to **Action groups** then select **Add**.
+- Next, we will add an action group. Scroll down to `Action groups` then select **Add**.
 - Call the action group `call-model`. For the Lambda function, we select `bedrock-agent-model-call`.
-- For the API Schema, we will choose `Define with in-line OpenAPI schema editor`. Copy & paste the schema from below into the `In-line OpenAPI schema` editor, then select **Add**:
+- For the API Schema, we will choose `Define with in-line OpenAPI schema editor`. Copy & paste the schema from below into the **In-line OpenAPI schema** editor, then select **Add**:
 `(This API schema is needed so that the bedrock agent knows the format structure and parameters needed for the action group to interact with the Lambda function.)`
 
 ```schema
@@ -150,7 +181,7 @@ You are an research agent that interacts with various models to do tasks and ret
   "openapi": "3.0.0",
   "info": {
     "title": "Model Inference API",
-    "description": "API for calling a model with a prompt, model ID, and an optional image",
+    "description": "API for inferring a model with a prompt, and model ID.",
     "version": "1.0.0"
   },
   "paths": {
@@ -227,9 +258,9 @@ You are an research agent that interacts with various models to do tasks and ret
 }
 ```
 
-- Now we will need to modify the `Advanced prompts`. Select the orange **Edit in Agent Builder** button at the top. Scroll down to advanced prompts, then select `Edit`.
+- Now we will need to modify the **Advanced prompts**. Select the orange **Edit in Agent Builder** button at the top. Scroll down to advanced prompts, then select `Edit`.
 
-- In the `Advanced prompts` box under `Pre-processing template` enable the `Override pre-processing template defaults` option. Also, make sure that `Activate pre-processing template` is disabled. This is so that we will bypass the possibility of deny responses. We are choosing this option for simplicity. Ideally, you would modify these prompts instead to allow what is required. 
+- In the `Advanced prompts` box under `Pre-processing template`, enable the `Override pre-processing template defaults` option. Also, make sure that `Activate pre-processing template` is disabled. This is so that we will bypass the possibility of deny responses. We are choosing this option for simplicity. Ideally, you would modify these prompts to allow only what is required. 
 
 - In the `Prompt template editor`, go to line 19 or 20 and Copy & paste the following prompt:
 
@@ -242,15 +273,15 @@ Here is an example of what a url response to access an image should look like:
 </url_example>
 ```
 
-- This prompt is needed so that the prsigned url response will be formatted a certain way when images are generated.
+- This prompt helps provide the agent an example on formatting the response of a presigned url when images are generated. Additionally, provide  an option of using a [custom parser Lambda function](https://docs.aws.amazon.com/bedrock/latest/userguide/lambda-parser.html) for more specific formatting. 
 
-- Scroll to the bottom and select the orange button `Save and exit`.
+- Scroll to the bottom and select the button `Save and exit`.
 
 
 ### Step 6: Test various models
 
-- On the right, you should see an option  to test the agent with a user input field. Below are a few prompts that you can test. However, you can become creative if you all and test variations. 
-- One thing to note before testing. When you do text-to-image or image-to-text, the sample code references the same .png file statically. In an ideal environment, this step can be configured to be more dynamically.
+- On the right, you should see an option  to test the agent with a user input field. Below are a few prompts that you can test. However, we encourage you to become creative and test variations of input. 
+- One thing to note before testing. When you do text-to-image or image-to-text, the project code references the same .png file statically. In an ideal environment, this step can be configured to be more dynamically.
 
 
 ``` prompt
@@ -270,20 +301,15 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 ```
 
 
-
-
-
+***(If you would like to have a UI setup with this project, continue to step 7)***
 
 ## Step 7: Setting up and running the Streamlit app
+
 -  **Obtain the Streamlit App ZIP File**: Download the zip file of the project [here](https://github.com/build-on-aws/bedrock-agents-streamlit/archive/refs/heads/main.zip).
 
+- Navigate back to the IDE you used to open up the project.
 
--  **Unzip the File**:
-   - Use the following command  to extract the contents:
-  
-     ```bash
-     unzip bedrock-agents-multiple-models
-     ```
+
      
 -  **Navigate to Streamlit_App Folder**:
    - Change to the directory containing the Streamlit app. Use this command
