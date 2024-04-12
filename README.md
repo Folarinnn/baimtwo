@@ -78,7 +78,7 @@ This project is intended to be a baseline for builders to extend there use cases
 
 - We will need to create a container registry in [ECR (Elastic Container registry)](https://aws.amazon.com/ecr/). This will be used to store our Docker container image for our Lambda function. 
 
-- Log into the management console, and search `ECR` in the search bar at the top. Select the service, then **Create repository**.
+- Log into the management console, and search `ECR` in the search bar at the top. Select the service, then ***Create repository***.
 
 ![ecr btn](streamlit_app/images/ecr_create_btn.png)
 
@@ -124,12 +124,12 @@ This project is intended to be a baseline for builders to extend there use cases
 
 - Select `Create function`. Then select the `Container image` radio button from the top 3 options.
 - We will call this Lambda function `bedrock-agent-model-call`. For `Container image URI`, browse the images, select repo `bedrock-agent-bedrock-agent-model-calls`, then the latest image. 
-- Leave the other options as default, then select the button **Create function**.
+- Leave the other options as default, then select the button ***Create function***.
 
 - Once the Lambda function is created, we need to provide the bedrock agent permissions to invoke it. Scroll down and select the `Configuration` tab. On the left, select `Permissions`. Scroll down to **Resource-based policy statements** and select `Add permissions`.
 
 - Select `AWS service` in the middle for your policy statement. Choose `Other` for your service, and put `allow-agent` for the StatementID. For the Principal, put `bedrock.amazonaws.com `.
-- Enter `arn:aws:bedrock:us-west-2:{aws-account-id}:agent/* `. ***Please note, AWS recommends least privilage so only the allowed agent can invoke this Lambda function***. A `*` at the end of the ARN grants any agent in the account access to invoke this Lambda. Ideally, we would not use this in a production environment. Lastly, for the Action, select `lambda:InvokeAction`, then **Save**.
+- Enter `arn:aws:bedrock:us-west-2:{aws-account-id}:agent/* `. ***Please note, AWS recommends least privilage so only the allowed agent can invoke this Lambda function***. A `*` at the end of the ARN grants any agent in the account access to invoke this Lambda. Ideally, we would not use this in a production environment. Lastly, for the Action, select `lambda:InvokeAction`, then ***Save***.
 
 
 ### Step 5: Setup Bedrock agent and action group 
@@ -141,9 +141,9 @@ This project is intended to be a baseline for builders to extend there use cases
 You are an research agent that interacts with various models to do tasks and return information. You use the model ID and prompt from the request, then use your available tools to call models. You use these models for text/code generation, summarization, problem solving, text-to-sql, response comparisons and ratings. You also allow models to do image-to-text. Models can also do text-to-image, while returning a url similar to this example {url_example}. You are only allowed to retrieve information the way I ask. Do not decide when to provide your own response, unless you ask. Return every response in clean format.
 ```
 
-- Next, we will add an action group. Scroll down to `Action groups` then select **Add**.
+- Next, we will add an action group. Scroll down to `Action groups` then select ***Add***.
 - Call the action group `call-model`. For the Lambda function, we select `bedrock-agent-model-call`.
-- For the API Schema, we will choose `Define with in-line OpenAPI schema editor`. Copy & paste the schema from below into the **In-line OpenAPI schema** editor, then select **Add**:
+- For the API Schema, we will choose `Define with in-line OpenAPI schema editor`. Copy & paste the schema from below into the **In-line OpenAPI schema** editor, then select ***Add***:
 `(This API schema is needed so that the bedrock agent knows the format structure and parameters needed for the action group to interact with the Lambda function.)`
 
 ```schema
@@ -297,7 +297,6 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
    - Open the `invoke_agent.py` file.
    - On line 23 & 24, update the `agentId` and `agentAliasId` variables with the appropriate values, then save it.
 
-![Update Agent ID and alias](Streamlit_App/images/update_agentId_and_alias.png)
 
 -  **Install Streamlit** (if not already installed):
    - Run the following command to install all of the dependencies needed:
