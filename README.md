@@ -94,19 +94,6 @@ This project is intended to be a baseline for builders to extend there use cases
 
 -  Once downloaded, **unzip the file**:
 
-   - Use the following command  to extract the contents:
-  
-    ***macOS/Linux***
-     ```linux
-     unzip bedrock-agents-multiple-models
-     ```
-
-    ***Windows***
-
-    ```windows
-     Expand-Archive -Path bedrock-agents-multiple-models.zip
-     ```
-
 - Open up the project in your IDE of choice. For this project, I will be using [Visual Studio code](https://code.visualstudio.com/docs/sourcecontrol/intro-to-git). Please review the code briefly. 
 
 - We will need to run Docker in order to create a docker container image that will be used for our Lambda function. This function will be used with the action group of the agent in order to infer your model of choice. 
@@ -114,8 +101,6 @@ This project is intended to be a baseline for builders to extend there use cases
 - Navigate to the root directory of the project `bedrock-agent-call-multiple-models` in your IDE. Open a terminal here is well. 
 
 - The commands below can be used to login your ECR, then build, tag, and push your Docker container image to ECR. **Make sure to update the {account-number} in the commands throughout this project. Region us-west-2 is assumed.**
-
-- For ***macOS/Linux***:
 
    ```bash 
    aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin {account-number}.dkr.ecr.us-west-2.amazonaws.com 
@@ -130,23 +115,8 @@ This project is intended to be a baseline for builders to extend there use cases
    docker push {account-number}.dkr.ecr.us-west-2.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest 
    ```
 
-- For ***Windows***:
 
-   ```bash 
-    (Get-ECRLoginCommand).Password | docker login --username AWS --password-stdin {account-number}.dkr.ecr.us-west-2.amazonaws.com
-   ```
-   ```bash 
-   docker build -t app1:local -f Dockerfile.app1 . 
-   ```
-   ```bash 
-   docker tag app1:local {account-number}.dkr.ecr.us-west-2.amazonaws.com/bedrock-agent-model-calls:latest 
-   ```
-   ```bash 
-   docker push {account-number}.dkr.ecr.us-west-2.amazonaws.com/bedrock-agent-bedrock-agent-model-calls:latest 
-   ```
-
-
-- More documentation on setting up ECR & installing Docker can be found [here](https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html).
+***More documentation on setting up ECR & installing Docker can be found [here](https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html).***
 
 
 ### Step 4: Lambda function creation
@@ -305,21 +275,27 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 
 ## Step 7: Setting up and running the Streamlit app
 
--  **Obtain the Streamlit App ZIP File**: Download the zip file of the project [here](https://github.com/build-on-aws/bedrock-agents-streamlit/archive/refs/heads/main.zip).
+- You will need to have an `agent alias ID`, along with the `agent ID` for this step. Go to the Bedrock management console, then select your multi-model agent. Copy the `Agent ID` from the top-right of the `Agent overview` section. Then, scroll down to **Aliases** and select ***Create***. Name the alias `a1`, then create the agent. Save the `Alias ID` generated.
 
-- Navigate back to the IDE you used to open up the project.
-
-
+- now, navigate back to the IDE you used to open up the project.
      
 -  **Navigate to Streamlit_App Folder**:
-   - Change to the directory containing the Streamlit app. Use this command
-     ``` bash
+
+   - Change to the directory containing the Streamlit app:
+
+    ***macOS/Linux***
+     ```linux
      cd ~/environment/bedrock-agents-multiple-models/streamlit_app
      ```
-     
+
+     ***Windows***
+     ```windows
+     cd %USERPROFILE%\environment\bedrock-agents-multiple-models\streamlit_app
+     ```
+
 -  **Update Configuration**:
    - Open the `invoke_agent.py` file.
-   - Update the `agentId` and `agentAliasId` variables with the appropriate values, then save it.
+   - On line 23 & 24, update the `agentId` and `agentAliasId` variables with the appropriate values, then save it.
 
 ![Update Agent ID and alias](Streamlit_App/images/update_agentId_and_alias.png)
 
@@ -339,12 +315,12 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
      
    - Once the app is running, please test some of the sample prompts provided. (On 1st try, if you receive an error, try again.)
 
-![Running App ](Streamlit_App/images/running_app.png)
+![Running App ](streamlit_app/images/running_app.png)
 
 
    - Optionally, you can review the [trace events](https://docs.aws.amazon.com/bedrock/latest/userguide/trace-events.html) in the left toggle of the screen. This data will include the **Preprocessing, Orchestration**, and **PostProcessing** traces.
 
-![Trace events ](Streamlit_App/images/trace_events.png)
+![Trace events ](streamlit_app/images/trace_events.png)
 
 
 
