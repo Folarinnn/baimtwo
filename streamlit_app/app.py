@@ -35,17 +35,17 @@ request_prompt = request_prompt.strip()
 submit_button = st.button("Submit", type="primary")
 
 # Create a file uploader widget
-uploaded_file = st.file_uploader("", type=['jpg', 'jpeg', 'png'])
+#uploaded_file = st.file_uploader("", type=['jpg', 'jpeg', 'png'])
 
 # Check if a file has been uploaded
-if uploaded_file is not None:
-    result_message = agenthelper.upload_image_to_s3(uploaded_file)
-    st.write(result_message)
+# if uploaded_file is not None:
+#     result_message = agenthelper.upload_image_to_s3(uploaded_file)
+#     st.write(result_message)
 
-    # Display the uploaded image
-    st.image(uploaded_file, caption='Uploaded Image.', width=300)
-else:
-    st.write("Please upload an image file.")
+#     # Display the uploaded image
+#     st.image(uploaded_file, caption='Uploaded Image.', width=300)
+# else:
+#     st.write("Please upload an image file.")
 
 
 

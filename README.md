@@ -320,7 +320,5 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 
    - Optionally, you can review the [trace events](https://docs.aws.amazon.com/bedrock/latest/userguide/trace-events.html) in the left toggle of the screen. This data will include the **Preprocessing, Orchestration**, and **PostProcessing** traces.
 
-![Trace events ](streamlit_app/images/trace_events.png)
-
 
 
