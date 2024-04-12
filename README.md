@@ -70,7 +70,9 @@ This project is intended to be a baseline for builders to extend there use cases
 
 ### Step 1: Creating an Amazon S3 bucket
 - This step will be required in order to do image-to-text and text-to-image inference to certain models. Also, make sure that you are in the **us-west-2** region. If another region is required, you will need to update the region in the `invoke_agent.py` file on line 26 of the project code. 
-- Create an S3 bucket, and call it `bedrock-agent-images-{alias}`. Make sure to update `{alias}` with the correct value. THe rest of the settings will remain default.
+
+- Create an S3 bucket, and call it `bedrock-agent-images-{alias}`. The rest of the settings will remain default. ***Make sure to update {alias} with the correct value throughout this project**
+
 - Next, upload the sample image from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/blob/main/images/generated_pic.png), to this S3 bucket.
 
 
@@ -123,12 +125,15 @@ This project is intended to be a baseline for builders to extend there use cases
 - Now we create a Lambda function (Python 3.12) for the bedrock agent's action group using the container image from the previous step. Navigate back to the AWS management console, then in the search bar, type `Lambda` then selct the service.
 
 - Select `Create function`. Then select the `Container image` radio button from the top 3 options.
+
 - We will call this Lambda function `bedrock-agent-model-call`. For `Container image URI`, browse the images, select repo `bedrock-agent-bedrock-agent-model-calls`, then the latest image. 
+
 - Leave the other options as default, then select the button ***Create function***.
 
 - Once the Lambda function is created, we need to provide the bedrock agent permissions to invoke it. Scroll down and select the `Configuration` tab. On the left, select `Permissions`. Scroll down to **Resource-based policy statements** and select `Add permissions`.
 
 - Select `AWS service` in the middle for your policy statement. Choose `Other` for your service, and put `allow-agent` for the StatementID. For the Principal, put `bedrock.amazonaws.com `.
+
 - Enter `arn:aws:bedrock:us-west-2:{aws-account-id}:agent/* `. ***Please note, AWS recommends least privilage so only the allowed agent can invoke this Lambda function***. A `*` at the end of the ARN grants any agent in the account access to invoke this Lambda. Ideally, we would not use this in a production environment. Lastly, for the Action, select `lambda:InvokeAction`, then ***Save***.
 
 
@@ -142,7 +147,9 @@ You are an research agent that interacts with various models to do tasks and ret
 ```
 
 - Next, we will add an action group. Scroll down to `Action groups` then select ***Add***.
+
 - Call the action group `call-model`. For the Lambda function, we select `bedrock-agent-model-call`.
+
 - For the API Schema, we will choose `Define with in-line OpenAPI schema editor`. Copy & paste the schema from below into the **In-line OpenAPI schema** editor, then select ***Add***:
 `(This API schema is needed so that the bedrock agent knows the format structure and parameters needed for the action group to interact with the Lambda function.)`
 
@@ -228,6 +235,7 @@ You are an research agent that interacts with various models to do tasks and ret
 }
 ```
 
+
 - Now we will need to modify the **Advanced prompts**. Select the orange **Edit in Agent Builder** button at the top. Scroll down to advanced prompts, then select `Edit`.
 
 - In the `Advanced prompts` box under `Pre-processing template`, enable the `Override pre-processing template defaults` option. Also, make sure that `Activate pre-processing template` is disabled. This is so that we will bypass the possibility of deny responses. We are choosing this option for simplicity. Ideally, you would modify these prompts to allow only what is required. 
@@ -243,6 +251,7 @@ Here is an example of what a url response to access an image should look like:
 </url_example>
 ```
 
+
 - This prompt helps provide the agent an example on formatting the response of a presigned url when images are generated. Additionally, there is an option to use a [custom parser Lambda function](https://docs.aws.amazon.com/bedrock/latest/userguide/lambda-parser.html) for more granular formatting. 
 
 - Scroll to the bottom and select the `Save and exit` button.
@@ -251,8 +260,8 @@ Here is an example of what a url response to access an image should look like:
 ### Step 6: Test various models
 
 - On the right, you should see an option  to test the agent with a user input field. Below are a few prompts that you can test. However, we encourage you to become creative and test variations of input. 
-- One thing to note before testing. When you do text-to-image or image-to-text, the project code references the same .png file statically. In an ideal environment, this step can be configured to be more dynamically.
 
+- One thing to note before testing. When you do text-to-image or image-to-text, the project code references the same .png file statically. In an ideal environment, this step can be configured to be more dynamically.
 
 ``` prompt
 Use model amazon.titan-image-generator-v1 and create me an image of a woman in a boat on a river.
@@ -295,6 +304,7 @@ Use model ai21.j2-mid-v1. You are a gifted copywriter, with special expertise in
 
 -  **Update Configuration**:
    - Open the `invoke_agent.py` file.
+   
    - On line 23 & 24, update the `agentId` and `agentAliasId` variables with the appropriate values, then save it.
 
 
