@@ -1,4 +1,4 @@
-# Setup Amazon Bedrock agent to call various models.
+# Setup Amazon Bedrock agent to Infer various LLMs.
 
 ## Introduction
 This project is intended to be a baseline for builders to extend there use cases across various LLMs via Amazon Bedrock agents. The intent is to show the art of the possible leveraging all available models on Bedrock for chained responses to fit different use cases. This README is a guide to setting this up, giving you the ability to further explore the power of agents with the latest models on Amazon bedrock. 
@@ -65,10 +65,10 @@ This project is intended to be a baseline for builders to extend there use cases
 
 ![Diagram](images/diagram.png)
 
+
 ## Configuration and Setup
 
-
-### Step 1: Creating an S3 Bucket
+### Step 1: Creating an Amazon S3 bucket
 - This step will be required in order to do image-to-text and text-to-image inference to certain models. Also, make sure that you are in the **us-west-2** region. If another region is required, you will need to update the region in the `invoke_agent.py` file on line 26 of the project code. 
 - Create an S3 bucket, and call it `bedrock-agent-images-{alias}`. Make sure to update `{alias}` with the correct value. THe rest of the settings will remain default.
 - Next, upload the sample image from [here](https://github.com/jossai87/bedrock-agent-call-multiple-models/blob/main/images/generated_pic.png), to this S3 bucket.
@@ -243,9 +243,9 @@ Here is an example of what a url response to access an image should look like:
 </url_example>
 ```
 
-- This prompt helps provide the agent an example on formatting the response of a presigned url when images are generated. Additionally, provide  an option of using a [custom parser Lambda function](https://docs.aws.amazon.com/bedrock/latest/userguide/lambda-parser.html) for more specific formatting. 
+- This prompt helps provide the agent an example on formatting the response of a presigned url when images are generated. Additionally, there is an option to use a [custom parser Lambda function](https://docs.aws.amazon.com/bedrock/latest/userguide/lambda-parser.html) for more granular formatting. 
 
-- Scroll to the bottom and select the button `Save and exit`.
+- Scroll to the bottom and select the `Save and exit` button.
 
 
 ### Step 6: Test various models
@@ -263,7 +263,7 @@ Use model anthropic.claude-3-haiku-20240307-v1:0 and describe to me the image th
 ```
 
 ``` prompt
-Use model amazon.titan-image-generator-v1 and create me an image of a woman in a boat on a river.
+Use model stability.stable-diffusion-xl-v0. Create an image of an astronaut riding a horse in the desert.
 ```
 
 ``` prompt
